@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Historia Política Argentina — 1880–2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  /* ── DARK THEME ── */
+  [data-theme="dark"] {
+    --bg: #0f0e0c;
+    --surface: #181714;
+    --surface2: #201e1b;
+    --border: #2e2b26;
+    --border-light: #3d3930;
+    --text: #e8e2d9;
+    --text-muted: #8a8278;
+    --text-dim: #5a5650;
+    --gold: #c9a84c;
+    --gold-dim: #7a6330;
+    --red: #b34040;
+    --red-dim: #6b2626;
+    --chart-grid: #2e2b26;
+    --chart-tick: #5a5650;
+    --chart-legend: #8a8278;
+    --prose-text: #cec8bf;
+  }
+
+  /* ── LIGHT THEME ── */
+  [data-theme="light"] {
+    --bg: #f5f2ec;
+    --surface: #fdfaf4;
+    --surface2: #f0ebe0;
+    --border: #d8d0c0;
+    --border-light: #c4bba8;
+    --text: #1a1714;
+    --text-muted: #4a4540;
+    --text-dim: #7a7268;
+    --gold: #8c6914;
+    --gold-dim: #c49a3c;
+    --red: #8b2222;
+    --red-dim: #e8c0c0;
+    --chart-grid: #ddd6c8;
+    --chart-tick: #7a7268;
+    --chart-legend: #4a4540;
+    --prose-text: #2e2a24;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 16px;
+    line-height: 1.7;
+    display: flex;
+    min-height: 100vh;
+    transition: background 0.25s, color 0.25s;
+  }
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    width: 290px;
+    min-width: 290px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    transition: background 0.25s, border-color 0.25s;
+  }
+
+  .sidebar-header {
+    padding: 32px 28px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-header .label {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .sidebar-header h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--text);
+  }
+
+  .sidebar-header .year-range {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 7px;
+    letter-spacing: 0.08em;
+    font-style: italic;
+  }
+
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px;
+    background: var(--surface2);
+    width: fit-content;
+    transition: all 0.2s;
+  }
+
+  .theme-toggle:hover { border-color: var(--gold); }
+
+  .theme-toggle span {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 600;
+    user-select: none;
+  }
+
+  .theme-icon { font-size: 13px; }
+
+  nav { flex: 1; padding: 8px 0; }
+
+  .nav-group-label {
+    font-size: 8.5px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-weight: 600;
+    padding: 14px 20px 4px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: stretch;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    transition: background 0.15s;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-item:hover { background: var(--surface2); }
+  .nav-item.active { background: var(--surface2); }
+  .nav-item.active .nav-marker { background: var(--gold); }
+
+  .nav-marker {
+    width: 3px;
+    background: transparent;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .nav-inner { padding: 12px 18px; flex: 1; }
+
+  .nav-period {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 2px;
+    font-weight: 600;
+  }
+
+  .nav-title {
+    font-size: 12.5px;
+    color: var(--text);
+    line-height: 1.35;
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+  }
+
+  .sidebar-footer {
+    padding: 14px 28px;
+    border-top: 1px solid var(--border);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── MAIN ── */
+  #main { flex: 1; overflow-y: auto; }
+
+  .section {
+    display: none;
+    min-height: 100vh;
+    padding: 52px 64px 80px;
+    max-width: 880px;
+    animation: fadeIn 0.35s ease;
+  }
+
+  .section.active { display: block; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .section-meta {
+    font-size: 9.5px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 36px;
+    font-weight: 900;
+    line-height: 1.12;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .section-subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-bottom: 38px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 34px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab-btn {
+    background: none;
+    border: none;
+    padding: 10px 20px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-family: 'Source Serif 4', serif;
+    font-weight: 600;
+    transition: color 0.2s;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+
+  .tab-btn:hover { color: var(--text-muted); }
+  .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fadeIn 0.25s ease; }
+
+  /* Prose */
+  .prose p {
+    font-size: 15.5px;
+    line-height: 1.8;
+    color: var(--prose-text);
+    margin-bottom: 20px;
+  }
+
+  .prose strong { color: var(--text); }
+
+  /* Callout */
+  .callout {
+    border-left: 3px solid var(--gold);
+    padding: 16px 20px;
+    background: var(--surface2);
+    margin: 26px 0;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .callout-label {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .callout p {
+    font-size: 14px !important;
+    color: var(--text-muted) !important;
+    margin: 0 !important;
+    font-style: italic;
+  }
+
+  .callout.danger { border-left-color: var(--red); }
+  .callout.danger .callout-label { color: var(--red); }
+
+  /* Key figures */
+  .key-figures {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    margin: 28px 0;
+    border: 1px solid var(--border);
+  }
+
+  .key-figure {
+    background: var(--surface);
+    padding: 18px 14px;
+    text-align: center;
+  }
+
+  .key-figure .kf-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .key-figure .kf-label {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+
+  /* Timeline */
+  .timeline { margin: 30px 0; }
+
+  .tl-item {
+    display: flex;
+    gap: 18px;
+    position: relative;
+  }
+
+  .tl-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 37px;
+    top: 38px;
+    width: 1px;
+    height: calc(100% - 10px);
+    background: var(--border);
+  }
+
+  .tl-year {
+    min-width: 56px;
+    text-align: right;
+    padding-top: 17px;
+    font-family: 'Playfair Display', serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gold-dim);
+  }
+
+  .tl-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 2px solid var(--gold-dim);
+    margin-top: 21px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tl-content { flex: 1; padding: 12px 0 22px; }
+
+  .tl-event { font-size: 13.5px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .tl-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+  /* Debate */
+  .debate {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    margin: 26px 0;
+    border: 1px solid var(--border);
+  }
+
+  .debate-side { background: var(--surface); padding: 20px 18px; }
+
+  .debate-side-label {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .debate-side.lib .debate-side-label { color: #6b9bc7; }
+  .debate-side.rev .debate-side-label { color: #c77a6b; }
+  .debate-side.pro .debate-side-label { color: #72b58a; }
+  .debate-side.con .debate-side-label { color: #c79a6b; }
+  .debate-side.lib2 .debate-side-label { color: #9b8bc7; }
+  .debate-side.pop .debate-side-label { color: #c7a86b; }
+
+  .debate-side p { font-size: 13.5px; color: var(--text-muted); line-height: 1.65; }
+
+  /* Chart */
+  .chart-wrap {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 22px;
+    margin: 26px 0;
+    border-radius: 2px;
+  }
+
+  .chart-title {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+
+  canvas { max-height: 240px; }
+
+  /* Myth */
+  .myth {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 22px 26px;
+    margin-bottom: 14px;
+    transition: background 0.25s;
+  }
+
+  .myth-tag {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: 3px 8px;
+    margin-bottom: 10px;
+    display: inline-block;
+  }
+
+  .myth-tag.mito { background: var(--red-dim); color: var(--red); }
+  .myth-tag.realidad { background: var(--surface); color: var(--gold); border: 1px solid var(--gold-dim); }
+
+  .myth h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 15.5px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 9px;
+    line-height: 1.4;
+  }
+
+  .myth p { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    body { flex-direction: column; }
+    #sidebar { width: 100%; min-width: unset; height: auto; position: relative; }
+    .section { padding: 28px 20px 56px; }
+    .debate { grid-template-columns: 1fr; }
+  }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="sidebar-header">
+    <div class="label">Estudio Político</div>
+    <h1>Historia Argentina</h1>
+    <div class="year-range">1880 — 2026 &nbsp;·&nbsp; Análisis historiográfico</div>
+    <div class="theme-toggle" onclick="toggleTheme()" title="Cambiar modo">
+      <span class="theme-icon" id="themeIcon">☀️</span>
+      <span id="themeLabel">Modo Claro</span>
+    </div>
+  </div>
+  <nav>
+    <div class="nav-group-label">Período Clásico</div>
+    <button class="nav-item active" onclick="showSection('pre1930', this)">
+      <div class="nav-marker"></div>
+      <div class="nav-inner">
+        <div class="nav-period">1880 – 1930</div>
+        <div class="nav-title">La Argentina Agroexportadora</div>
+      </div>
+    </button>
+    <button class="nav-item" onclick="showSection('infame', this)">
+      <div class="nav-marker"></div>
+      <div class="nav-inner">
+        <div class="nav-period">1930 – 1943</div>
+        <div class="nav-title">La Década Infame</div>
+      </div>
+    </button>
+    <button class="nav-item" onclick="showSection('peronismo', this)">
+      <div class="nav-marker"></div>
+      <div class="nav-inner">
+        <div class="nav-period">1943 – 1955</div>
+        <div class="nav-title">El Peronismo Clásico</div>
+      </div>
+    </button>
+    <button class="nav-item" onclick="showSection('inestabilidad', this)">
+      <div class="nav-marker"></div>
+      <div class="nav-inner">
+        <div class="nav-period">1955 – 1976</div>
+        <div class="nav-title">Inestabilidad y Proscripción</div>
+      </div>
+    </button>
+    <button class="nav-item" onclick="showSection('dictadura', this)">
+      <div class="nav-marker"></div>
+      <div class="nav-inner">
+        <div class="nav-period">1976 – 1983</div>
+        <div class="nav-title">La Dictadura Militar</div>
+      </div>
+    </button>
+    <button class="nav-item" onclick="showSection('crisis2001', this)">
+      <div class="nav-marker"></div>
+      <div class="nav-inner">
+        <div class="nav-period">1983 – 2001</div>
+        <div class="nav-title">Democracia y Crisis del 2001</div>
+      </div>
+    </button>
+    <div class="nav-group-label" style="margin-top:6px;">Argentina Contemporánea</div>
+    <button class="nav-item" onclick="showSection('kirchner', this)">
+      <div class="nav-marker"></div>
+      <div class="nav-inner">
+        <div class="nav-period">2003 – 2007</div>
+        <div class="nav-title">Néstor Kirchner</div>
+      </div>
+    </button>
+    <button class="nav-item" onclick="showSection('cfk', this)">
+      <div class="nav-marker"></div>
+      <div class="nav-inner">
+        <div class="nav-period">2007 – 2015</div>
+        <div class="nav-title">Cristina Fernández de Kirchner</div>
+      </div>
+    </button>
+    <button class="nav-item" onclick="showSection('macri', this)">
+      <div class="nav-marker"></div>
+      <div class="nav-inner">
+        <div class="nav-period">2015 – 2019</div>
+        <div class="nav-title">Mauricio Macri</div>
+      </div>
+    </button>
+    <button class="nav-item" onclick="showSection('alberto', this)">
+      <div class="nav-marker"></div>
+      <div class="nav-inner">
+        <div class="nav-period">2019 – 2023</div>
+        <div class="nav-title">Alberto Fernández</div>
+      </div>
+    </button>
+    <button class="nav-item" onclick="showSection('milei', this)">
+      <div class="nav-marker"></div>
+      <div class="nav-inner">
+        <div class="nav-period">2023 – 2026</div>
+        <div class="nav-title">Javier Milei</div>
+      </div>
+    </button>
+    <div class="nav-group-label" style="margin-top:6px;">Síntesis</div>
+    <button class="nav-item" onclick="showSection('mitos', this)">
+      <div class="nav-marker"></div>
+      <div class="nav-inner">
+        <div class="nav-period">Análisis</div>
+        <div class="nav-title">Mitos y Conclusiones</div>
+      </div>
+    </button>
+  </nav>
+  <div class="sidebar-footer">Material de estudio · Historia política argentina</div>
+</aside>
+
+<main id="main">
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 1: PRE-1930
+  ══════════════════════════════════════ -->
+  <div id="sec-pre1930" class="section active">
+    <div class="section-meta">Período I &nbsp;·&nbsp; 1880 – 1930</div>
+    <h2 class="section-title">La Argentina Agroexportadora</h2>
+    <p class="section-subtitle">El modelo liberal conservador y la inserción en el mercado mundial</p>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('pre1930','pol',this)">Política</button>
+      <button class="tab-btn" onclick="showTab('pre1930','eco',this)">Economía</button>
+      <button class="tab-btn" onclick="showTab('pre1930','his',this)">Historiografía</button>
+    </div>
+    <div id="pre1930-pol" class="tab-panel active">
+      <div class="prose">
+        <p>Desde la consolidación del Estado nacional en 1880, Argentina fue gobernada por una <strong>oligarquía terrateniente</strong> organizada en el Partido Autonomista Nacional (PAN). El régimen se sostenía sobre el fraude electoral sistemático y la exclusión de las mayorías de la vida política. Los presidentes sucedían a los presidentes con la naturalidad de quienes simplemente se turnan en la administración de lo que ya es suyo.</p>
+        <p>La <strong>Ley Sáenz Peña (1912)</strong> introdujo el voto secreto y obligatorio para los varones, desmantelando el mecanismo del fraude. Esto permitió el ascenso de Hipólito Yrigoyen y la Unión Cívica Radical en 1916: la primera vez que las clases medias urbanas e inmigrantes accedían al poder mediante elecciones limpias. Fue una transformación profunda del sistema político.</p>
+        <p>El radicalismo gobernó hasta 1930, pero con límites claros: el poder económico permanecía intacto en manos de los terratenientes y el capital extranjero. Cuando Yrigoyen comenzó su segundo mandato en 1928, ya anciano y con su gobierno desgastado, la crisis internacional de 1929 y el descontento de las élites prepararon el terreno para el primer golpe militar de la historia argentina moderna.</p>
+      </div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-year">1880</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Consolidación del Estado Nacional</div><div class="tl-desc">Roca asume la presidencia. Buenos Aires federalizada. Inicio del modelo agroexportador bajo control oligárquico.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">1912</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Ley Sáenz Peña</div><div class="tl-desc">Voto secreto y obligatorio para varones. Fin del fraude sistematizado. Primer paso hacia la democracia de masas.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">1916</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Primera presidencia de Yrigoyen</div><div class="tl-desc">La UCR gana con voto popular. Las clases medias y los hijos de inmigrantes llegan al poder por primera vez.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">1929</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Crisis internacional de Wall Street</div><div class="tl-desc">El precio de los commodities colapsa. La fragilidad del modelo mono-exportador queda expuesta sin posibilidad de ocultamiento.</div></div>
+        </div>
+      </div>
+    </div>
+    <div id="pre1930-eco" class="tab-panel">
+      <div class="key-figures">
+        <div class="key-figure"><div class="kf-value">7°</div><div class="kf-label">Posición mundial PBI p/cápita circa 1913</div></div>
+        <div class="key-figure"><div class="kf-value">~30%</div><div class="kf-label">Exportaciones argentinas sobre total latinoamericano</div></div>
+        <div class="key-figure"><div class="kf-value">60%</div><div class="kf-label">Comercio exterior orientado a Gran Bretaña</div></div>
+      </div>
+      <div class="prose">
+        <p>La Argentina se especializó en la exportación de cereales y carnes hacia Europa. Esta integración generó un alto crecimiento del PBI per cápita, pero <strong>sin diversificación productiva ni industria básica</strong>. El capital extranjero —ferrocarriles, frigoríficos, bancos— controlaba los sectores estratégicos. La tierra estaba concentrada en pocas manos: la oligarquía terrateniente era simultáneamente la clase económica y política dominante.</p>
+      </div>
+      <div class="callout">
+        <div class="callout-label">Concepto Clave</div>
+        <p>El modelo agroexportador generó crecimiento sin desarrollo. Alta renta, baja industrialización, y dependencia estructural de los precios internacionales de materias primas.</p>
+      </div>
+    </div>
+    <div id="pre1930-his" class="tab-panel">
+      <div class="prose"><p>El período pre-1930 es el eje de un debate historiográfico central que enfrenta dos tradiciones interpretativas fundamentales.</p></div>
+      <div class="debate">
+        <div class="debate-side lib">
+          <div class="debate-side-label">Corriente Liberal</div>
+          <p>Ve en este período la "edad de oro" argentina. El crecimiento material, la inmigración masiva, la educación pública y la integración al mercado mundial son leídos como señales de progreso y modernización ejemplar.</p>
+        </div>
+        <div class="debate-side rev">
+          <div class="debate-side-label">Corriente Revisionista</div>
+          <p>Denuncia la entrega del país al capital británico. Los ferrocarriles favorecían la exportación, no el desarrollo interno. La oligarquía bloqueó la industrialización para preservar sus rentas. El "progreso" benefició a pocos.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 2: DÉCADA INFAME
+  ══════════════════════════════════════ -->
+  <div id="sec-infame" class="section">
+    <div class="section-meta">Período II &nbsp;·&nbsp; 1930 – 1943</div>
+    <h2 class="section-title">La Década Infame</h2>
+    <p class="section-subtitle">El golpe del '30, el fraude electoral y los primeros pasos industriales</p>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('infame','pol',this)">Política</button>
+      <button class="tab-btn" onclick="showTab('infame','eco',this)">Economía</button>
+      <button class="tab-btn" onclick="showTab('infame','his',this)">Historiografía</button>
+    </div>
+    <div id="infame-pol" class="tab-panel active">
+      <div class="prose">
+        <p>El <strong>golpe del 6 de septiembre de 1930</strong> encabezado por el general Uriburu derrocó a Yrigoyen e inauguró una era de gobiernos conservadores apoyados en el fraude. Fue el primero de una larga serie de golpes militares que marcarían el siglo XX argentino. Su denominación popular —"Década Infame"— la acuñó el periodista José Luis Torres.</p>
+        <p>El régimen se sostuvo mediante la <strong>"Concordancia"</strong>, una alianza entre conservadores y antipersonalistas que ganó elecciones con métodos fraudulentos. El senador Lisandro de la Torre denunció públicamente desde el Congreso los vínculos entre el gobierno y los frigoríficos extranjeros, en un debate histórico en el que fue agredido físicamente dentro del recinto legislativo.</p>
+      </div>
+      <div class="callout danger">
+        <div class="callout-label">Pacto Roca-Runciman (1933)</div>
+        <p>Argentina se comprometía a no reducir las compras a Gran Bretaña a cambio de mantener cuotas de exportación de carne. Para el revisionismo, es el símbolo máximo de la dependencia colonial. Para el liberalismo, fue pragmatismo ante una crisis mundial sin precedentes.</p>
+      </div>
+    </div>
+    <div id="infame-eco" class="tab-panel">
+      <div class="prose">
+        <p>La crisis del '29 cerró los mercados mundiales y obligó a Argentina a producir lo que antes importaba. Nació así la <strong>Industrialización por Sustitución de Importaciones (ISI)</strong>: no como política deliberada, sino como respuesta pragmática a la emergencia. Se crearon el Banco Central (1935) y la Junta Reguladora de Granos.</p>
+        <p>Federico Pinedo diseñó políticas anticíclicas que representaron una intervención activa del Estado en la economía, sentando un precedente fundamental para las décadas siguientes. La industria liviana comenzó a crecer, aunque sin apoyo sistemático del Estado.</p>
+      </div>
+      <div class="callout">
+        <div class="callout-label">ISI — Industrialización por Sustitución de Importaciones</div>
+        <p>Modelo de desarrollo basado en producir internamente los bienes que antes se importaban, protegiendo la industria nacional mediante aranceles y subsidios. Dominó la política económica latinoamericana hasta los años '80.</p>
+      </div>
+    </div>
+    <div id="infame-his" class="tab-panel">
+      <div class="debate">
+        <div class="debate-side lib"><div class="debate-side-label">Visión Académica</div><p>Destaca el pragmatismo de Pinedo y la creación del Banco Central. Las instituciones económicas que Argentina construyó en los años '30 fueron sofisticadas para la época. La ISI emergente fue una respuesta racional a un contexto internacional adverso.</p></div>
+        <div class="debate-side rev"><div class="debate-side-label">Visión Nacionalista</div><p>El período encarna la traición de una clase dirigente dispuesta a preservar sus privilegios entregando la soberanía económica. El fraude electoral y el Pacto Roca-Runciman son la expresión de un régimen ilegítimo al servicio del capital extranjero.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 3: PERONISMO CLÁSICO
+  ══════════════════════════════════════ -->
+  <div id="sec-peronismo" class="section">
+    <div class="section-meta">Período III &nbsp;·&nbsp; 1943 – 1955</div>
+    <h2 class="section-title">El Peronismo Clásico</h2>
+    <p class="section-subtitle">Justicia social, Estado activo y la irrupción de la clase obrera</p>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('peronismo','pol',this)">Política</button>
+      <button class="tab-btn" onclick="showTab('peronismo','eco',this)">Economía</button>
+      <button class="tab-btn" onclick="showTab('peronismo','his',this)">Historiografía</button>
+    </div>
+    <div id="peronismo-pol" class="tab-panel active">
+      <div class="prose">
+        <p>El <strong>17 de octubre de 1945</strong> es el momento fundacional del peronismo: una columna masiva de trabajadores industriales marchó desde el Gran Buenos Aires hasta la Plaza de Mayo para exigir la liberación de Perón, detenido por sus propios camaradas militares. Fue la irrupción de la clase obrera industrial como actor político central.</p>
+        <p>Perón ganó las elecciones de 1946 con amplio margen. Su gobierno sancionó la <strong>Constitución de 1949</strong>, que incorporó derechos sociales, laborales y económicos, y aprobó el voto femenino (1947). Sin embargo, el régimen mostró rasgos autoritarios: clausura de medios opositores, persecución política y culto a la personalidad. Esta tensión entre democratización social y autoritarismo es el núcleo del debate hasta hoy.</p>
+        <p>El <strong>golpe de 1955</strong>, llamado "Revolución Libertadora" por sus ejecutores, derrocó a Perón con el apoyo de la marina y el ejército. El bombardeo de la Plaza de Mayo el 16 de junio de 1955, que dejó más de 300 muertos civiles, marcó el inicio de la violencia política que caracterizaría las décadas siguientes.</p>
+      </div>
+    </div>
+    <div id="peronismo-eco" class="tab-panel">
+      <div class="key-figures">
+        <div class="key-figure"><div class="kf-value">50/50</div><div class="kf-label">Distribución ingreso capital vs. trabajo (pico 1954)</div></div>
+        <div class="key-figure"><div class="kf-value">IAPI</div><div class="kf-label">Instituto que monopolizó el comercio exterior agropecuario</div></div>
+        <div class="key-figure"><div class="kf-value">1952</div><div class="kf-label">Crisis externa y ajuste. Fin de la fase expansiva</div></div>
+      </div>
+      <div class="prose">
+        <p>El primer peronismo nacionalizó los ferrocarriles, el Banco Central y los servicios públicos. El IAPI capturó las rentas agropecuarias para financiar la industria y los salarios. El resultado fue una redistribución del ingreso sin precedentes: la participación de los trabajadores en el ingreso nacional creció del ~40% al 50%.</p>
+        <p>Hacia 1952, la escasez de divisas y la inflación creciente obligaron a un ajuste. Perón firmó contratos con empresas petroleras extranjeras —contradiciendo su discurso soberanista— y buscó acercarse al capital privado. La fase redistributiva había alcanzado sus límites estructurales.</p>
+      </div>
+    </div>
+    <div id="peronismo-his" class="tab-panel">
+      <div class="prose"><p>Pocos temas generan debate tan intenso en la historiografía argentina. Las interpretaciones van desde la acusación de fascismo hasta la celebración como la mayor democratización social del siglo XX.</p></div>
+      <div class="debate">
+        <div class="debate-side lib"><div class="debate-side-label">Crítica Liberal</div><p>El peronismo fue un régimen autoritario y demagógico que destruyó las instituciones republicanas, corrompió el movimiento obrero con clientelismo y dilapidó las reservas acumuladas durante la guerra, generando las bases de la inestabilidad posterior.</p></div>
+        <div class="debate-side rev"><div class="debate-side-label">Defensa Nacional-Popular</div><p>El peronismo fue la primera experiencia de democratización real de Argentina: incorporó a los sectores populares, redistribuyó la riqueza, garantizó derechos sociales y construyó una identidad obrera que persiste hasta hoy.</p></div>
+      </div>
+      <div class="callout">
+        <div class="callout-label">Consenso Historiográfico Actual</div>
+        <p>La mayoría de los historiadores contemporáneos coinciden en que el peronismo fue un fenómeno complejo: genuina ampliación de derechos y democratización social, combinada con rasgos autoritarios incompatibles con la democracia liberal.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 4: INESTABILIDAD
+  ══════════════════════════════════════ -->
+  <div id="sec-inestabilidad" class="section">
+    <div class="section-meta">Período IV &nbsp;·&nbsp; 1955 – 1976</div>
+    <h2 class="section-title">Inestabilidad y Proscripción</h2>
+    <p class="section-subtitle">El empate hegemónico y la espiral de violencia política</p>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('inestabilidad','pol',this)">Política</button>
+      <button class="tab-btn" onclick="showTab('inestabilidad','eco',this)">Economía</button>
+      <button class="tab-btn" onclick="showTab('inestabilidad','his',this)">Historiografía</button>
+    </div>
+    <div id="inestabilidad-pol" class="tab-panel active">
+      <div class="prose">
+        <p>La "Revolución Libertadora" de 1955 declaró ilegal al peronismo: sus símbolos, su música y su nombre quedaron prohibidos. Esta proscripción convirtió al peronismo en un movimiento de resistencia con enorme base popular, imposible de derrotar electoralmente pero impedido de gobernar. La Argentina entró en un ciclo perverso: cuando ganaban los peronistas, los militares los tumbaban.</p>
+        <p>Los presidentes radicales —Frondizi (1958), Illia (1963)— gobernaron bajo tutela militar permanente. <strong>Ningún gobierno civil elegido democráticamente completó su mandato entre 1930 y 1983.</strong> La violencia política escaló hasta la creación de organizaciones guerrilleras —Montoneros, ERP— que justificaban sus acciones ante la imposibilidad de la política democrática.</p>
+        <p>El regreso de Perón en 1973 abrió una esperanza de pacificación que se frustró rápidamente con la masacre de Ezeiza (20 muertos), el asesinato de José Ignacio Rucci y la escalada de violencia de todos los sectores. Cuando Perón murió en julio de 1974, dejó un país al borde del abismo y una sucesora, Isabel Martínez de Perón, carente de la autoridad necesaria para gobernarlo.</p>
+      </div>
+    </div>
+    <div id="inestabilidad-eco" class="tab-panel">
+      <div class="prose">
+        <p>El período se caracterizó por el ciclo conocido como <strong>"stop-and-go"</strong>: la economía crecía hasta que la falta de divisas frenaba las importaciones industriales, luego el ajuste recesivo generaba protestas, y el ciclo comenzaba de nuevo sin que nadie pudiera romperlo.</p>
+        <p>Arturo Frondizi intentó resolver la restricción externa con el <strong>desarrollismo</strong>: atraer inversión extranjera en sectores estratégicos —petróleo, petroquímica, automotriz— para reducir la dependencia importadora. Los resultados fueron contradictorios: se desarrolló industria pesada pero aumentó la remisión de utilidades al exterior y la dependencia tecnológica.</p>
+      </div>
+      <div class="callout">
+        <div class="callout-label">El Ciclo Stop-and-Go</div>
+        <p>Mecanismo recurrente: el crecimiento industrial aumenta la demanda de insumos importados. Las divisas escasean. El peso se devalúa. La inflación sube. El gobierno ajusta y la economía entra en recesión. Luego se reactiva... y el ciclo se repite indefinidamente.</p>
+      </div>
+    </div>
+    <div id="inestabilidad-his" class="tab-panel">
+      <div class="prose">
+        <p>Juan Carlos Portantiero y Guillermo O'Donnell elaboraron el concepto de <strong>"empate hegemónico"</strong>: ningún sector social tenía la fuerza suficiente para imponer un proyecto de largo plazo. El resultado era parálisis e inestabilidad crónica. Esta teoría sigue siendo una de las más influyentes para entender la Argentina del siglo XX.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 5: DICTADURA
+  ══════════════════════════════════════ -->
+  <div id="sec-dictadura" class="section">
+    <div class="section-meta">Período V &nbsp;·&nbsp; 1976 – 1983</div>
+    <h2 class="section-title">La Dictadura Militar</h2>
+    <p class="section-subtitle">Terrorismo de Estado, desindustrialización y el quiebre definitivo</p>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('dictadura','pol',this)">Política</button>
+      <button class="tab-btn" onclick="showTab('dictadura','eco',this)">Economía</button>
+      <button class="tab-btn" onclick="showTab('dictadura','his',this)">Historiografía</button>
+    </div>
+    <div id="dictadura-pol" class="tab-panel active">
+      <div class="prose">
+        <p>El golpe del <strong>24 de marzo de 1976</strong> inauguró el régimen más brutal de la historia argentina. La Junta Militar implementó un <strong>plan sistemático de exterminio</strong>: 30.000 personas fueron detenidas-desaparecidas en centros clandestinos de detención, torturadas y asesinadas. Los bebés nacidos en cautiverio fueron apropiados y entregados a familias de militares o allegados.</p>
+        <p>El régimen terminó desacreditado tras la <strong>Guerra de Malvinas (1982)</strong>: la aventura militar para desviar la atención de la crisis económica y social derivó en una derrota humillante frente a Gran Bretaña. La rendición argentina el 14 de junio de 1982 aceleró el fin de la dictadura y abrió el camino a la transición democrática.</p>
+      </div>
+      <div class="callout danger">
+        <div class="callout-label">Cifras del Terror</div>
+        <p>Según la CONADEP (1984): 8.960 casos documentados de desaparecidos; organismos de derechos humanos estiman 30.000. 340 centros clandestinos de detención identificados. Cientos de niños apropiados a sus familias, de los cuales más de 130 han recuperado su identidad gracias a las Abuelas de Plaza de Mayo.</p>
+      </div>
+    </div>
+    <div id="dictadura-eco" class="tab-panel">
+      <div class="prose">
+        <p>El ministro José Alfredo Martínez de Hoz implementó una reforma estructural: apertura comercial y financiera, desregulación y desindustrialización. El resultado fue la destrucción de gran parte del aparato industrial construido durante décadas. La <strong>deuda externa se multiplicó por seis</strong> entre 1975 y 1983: de 8.000 a 45.000 millones de dólares. Gran parte correspondía a deuda privada de empresas que luego fue estatizada.</p>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-title">Deuda Externa Argentina — Evolución (miles de millones USD)</div>
+        <canvas id="chartDeuda"></canvas>
+      </div>
+    </div>
+    <div id="dictadura-his" class="tab-panel">
+      <div class="prose">
+        <p>En los primeros años democráticos predominó la <strong>"teoría de los dos demonios"</strong>: la violencia estatal y la guerrilla eran dos extremos igualmente responsables de la tragedia. Esta interpretación fue desplazada: el terrorismo de Estado fue un plan sistemático y masivo que no puede equipararse con la actividad guerrillera previa. Los juicios a las Juntas (1985) consolidaron este consenso.</p>
+      </div>
+      <div class="callout">
+        <div class="callout-label">Juicio a las Juntas (1985)</div>
+        <p>Argentina fue pionera mundial en juzgar penalmente a los responsables de crímenes de lesa humanidad en un proceso civil. Las condenas a Videla, Massera y otros son un hito del derecho internacional de los derechos humanos.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 6: DEMOCRACIA Y CRISIS 2001
+  ══════════════════════════════════════ -->
+  <div id="sec-crisis2001" class="section">
+    <div class="section-meta">Período VI &nbsp;·&nbsp; 1983 – 2001</div>
+    <h2 class="section-title">Democracia y Crisis del 2001</h2>
+    <p class="section-subtitle">La recuperación democrática, la hiperinflación menemista y el colapso de la convertibilidad</p>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('crisis2001','pol',this)">Política</button>
+      <button class="tab-btn" onclick="showTab('crisis2001','eco',this)">Economía</button>
+      <button class="tab-btn" onclick="showTab('crisis2001','his',this)">Historiografía</button>
+    </div>
+    <div id="crisis2001-pol" class="tab-panel active">
+      <div class="prose">
+        <p>Con la derrota en Malvinas, la dictadura se derrumbó. El 30 de octubre de 1983, Raúl Alfonsín (UCR) ganó las elecciones con el 52% de los votos, derrotando al peronismo por primera vez en elecciones libres. Su mandato estuvo marcado por el éxito histórico del juicio a las Juntas (1985) y el fracaso económico que culminó en la hiperinflación de 1989, obligándolo a adelantar la entrega del mando.</p>
+        <p><strong>Carlos Menem</strong> (1989-1999) gobernó durante una década transformando estructuralmente el país: privatizaciones masivas, convertibilidad y apertura económica. La estabilidad de los años '90 convivió con la corrupción sistémica y el deterioro de la industria nacional. Su gobierno reformó la Constitución en 1994 para habilitarse a la reelección.</p>
+        <p>El 19 y 20 de diciembre de 2001 estalló la crisis más profunda de la historia argentina reciente. El gobierno de De la Rúa había implementado el <strong>corralito</strong> —restricción al retiro de depósitos bancarios—. La respuesta fue una insurrección popular: saqueos, cacerolazos de la clase media, represión que dejó <strong>39 muertos</strong>. De la Rúa renunció en helicóptero. En una semana, Argentina tuvo cinco presidentes. La consigna "Que se vayan todos" condensó el agotamiento ciudadano.</p>
+      </div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-year">1983</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Retorno democrático — Alfonsín</div><div class="tl-desc">Primera elección libre desde 1973. Alfonsín gana con 52%. Inicio del período democrático ininterrumpido que llega hasta hoy.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">1985</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Juicio a las Juntas</div><div class="tl-desc">Videla, Massera y otros comandantes son condenados en un proceso civil histórico. Hito mundial en derechos humanos.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">1989</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Hiperinflación y llegada de Menem</div><div class="tl-desc">La inflación supera el 3.000% anual. Alfonsín adelanta la entrega del poder. Menem inicia la era de las privatizaciones.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">1991</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Plan de Convertibilidad</div><div class="tl-desc">Cavallo fija 1 peso = 1 dólar. Corta la hiperinflación. Comienza la estabilidad frágil basada en el endeudamiento externo.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">Dic 2001</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Corralito y estallido social</div><div class="tl-desc">39 muertos en represión. Renuncia De la Rúa. Cinco presidentes en una semana. Default soberano histórico. Pobreza del 54% en 2002.</div></div>
+        </div>
+      </div>
+    </div>
+    <div id="crisis2001-eco" class="tab-panel">
+      <div class="key-figures">
+        <div class="key-figure"><div class="kf-value">54%</div><div class="kf-label">Pobreza en 2002 (pico histórico)</div></div>
+        <div class="key-figure"><div class="kf-value">21%</div><div class="kf-label">Desempleo en 2002</div></div>
+        <div class="key-figure"><div class="kf-value">3.000%</div><div class="kf-label">Inflación anual en 1989 (hiperinflación)</div></div>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-title">Inflación/Deflación Argentina — 1998–2003</div>
+        <canvas id="chartInf"></canvas>
+      </div>
+      <div class="prose">
+        <p>La convertibilidad fue exitosa para eliminar la hiperinflación, pero creó una trampa: al fijar el peso al dólar, eliminó la posibilidad de devaluar para recuperar competitividad. Cuando Brasil devaluó en 1999, Argentina entró en recesión. La única salida era bajar salarios —deflación—, que generó años de desempleo creciente hasta el colapso final de 2001.</p>
+      </div>
+    </div>
+    <div id="crisis2001-his" class="tab-panel">
+      <div class="debate">
+        <div class="debate-side lib"><div class="debate-side-label">Énfasis en la Política</div><p>La crisis fue consecuencia del gasto público excesivo, la corrupción sistémica y la debilidad institucional de la Alianza. El problema era de gobernabilidad, no del modelo económico en sí mismo.</p></div>
+        <div class="debate-side rev"><div class="debate-side-label">Énfasis en el Modelo</div><p>La crisis fue inevitable dado el diseño de la convertibilidad: insostenible sin la flexibilidad cambiaria. Las recetas del FMI —ajuste en plena recesión— profundizaron la depresión. El problema era estructural.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 7: NÉSTOR KIRCHNER
+  ══════════════════════════════════════ -->
+  <div id="sec-kirchner" class="section">
+    <div class="section-meta">Período VII &nbsp;·&nbsp; 2003 – 2007</div>
+    <h2 class="section-title">Néstor Kirchner</h2>
+    <p class="section-subtitle">La reconstrucción del Estado, el desendeudamiento y la política de derechos humanos</p>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('kirchner','pol',this)">Política</button>
+      <button class="tab-btn" onclick="showTab('kirchner','eco',this)">Economía</button>
+      <button class="tab-btn" onclick="showTab('kirchner','his',this)">Historiografía</button>
+    </div>
+    <div id="kirchner-pol" class="tab-panel active">
+      <div class="prose">
+        <p>Néstor Kirchner asumió el 25 de mayo de 2003 con apenas el <strong>22,2% de los votos</strong> —el porcentaje más bajo de un presidente electo en la historia democrática argentina—, luego de que su adversario Carlos Menem se retirara del ballotage previendo una derrota segura. Era gobernador de la remota provincia de Santa Cruz y llegaba a la presidencia sin estructura partidaria nacional consolidada.</p>
+        <p>En los primeros meses de su gobierno, Kirchner tomó medidas de alto impacto político: renovó la Corte Suprema de Justicia incorporando a reconocidos juristas, retiró los cuadros de los comandantes de la dictadura del Colegio Militar en un acto cargado de simbolismo, e impulsó en el Congreso la <strong>anulación de las leyes de Obediencia Debida y Punto Final</strong>, reabriendo los juicios por crímenes de lesa humanidad cerrados desde los años '80. Esta política de derechos humanos le otorgó legitimidad política transversal.</p>
+        <p>En política exterior, Argentina bloqueó junto a Brasil el proyecto del ALCA (Área de Libre Comercio de las Américas) impulsado por Estados Unidos en la Cumbre de Mar del Plata (2005), y fortaleció los vínculos con Venezuela (Chávez) y Cuba, definiendo un perfil de autonomía en la región. En 2007, Kirchner decidió no presentarse a la reelección y apoyó la candidatura de su esposa, Cristina Fernández de Kirchner.</p>
+      </div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-year">2003</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Asunción con 22% de los votos</div><div class="tl-desc">Kirchner asume en condiciones de extrema fragilidad política. Menem se retira del ballotage. Nace el Frente para la Victoria (FPV).</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2003</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Renovación de la Corte Suprema</div><div class="tl-desc">Se reemplaza la "mayoría automática" menemista por juristas independientes. Decreto 222: concurso público para designación de jueces.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2003</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Anulación de leyes de impunidad</div><div class="tl-desc">El Congreso anula las leyes de Obediencia Debida y Punto Final. Los juicios por crímenes de lesa humanidad se reabren en todo el país.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2006</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Pago anticipado al FMI</div><div class="tl-desc">Argentina cancela toda su deuda con el FMI (USD 9.530 millones) en un pago único. El gesto es tanto económico como político: independencia del organismo.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2005</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Bloqueo del ALCA — Cumbre de Mar del Plata</div><div class="tl-desc">Argentina y Brasil bloquean el proyecto de libre comercio hemisférico de EE.UU. Kirchner comunica el "no" a George W. Bush.</div></div>
+        </div>
+      </div>
+    </div>
+    <div id="kirchner-eco" class="tab-panel">
+      <div class="key-figures">
+        <div class="key-figure"><div class="kf-value">~9%</div><div class="kf-label">Crecimiento anual promedio del PBI 2003-2007</div></div>
+        <div class="key-figure"><div class="kf-value">62%→35%</div><div class="kf-label">Pobreza al inicio y fin del mandato</div></div>
+        <div class="key-figure"><div class="kf-value">19%→8%</div><div class="kf-label">Desempleo al inicio y fin del mandato</div></div>
+      </div>
+      <div class="prose">
+        <p>La economía kirchnerista se apoyó sobre tres pilares: un <strong>tipo de cambio real competitivo</strong> (el peso devaluado abarataba las exportaciones), <strong>precios internacionales favorables</strong> para la soja y otras materias primas, y una política activa de <strong>reconstrucción del mercado interno</strong> mediante aumento de salarios y empleo. El PBI creció a tasas del 8-9% anual, el período más sostenido de crecimiento en un siglo.</p>
+        <p>En 2005, Argentina reestructuró su deuda con acreedores privados con una quita significativa —aceptada por el 76% de los tenedores— y en 2006 canceló toda la deuda con el FMI. Los "superávits gemelos" —fiscal y comercial— fueron el emblema macroeconómico del período. Sin embargo, la inflación comenzó a acelerarse desde 2005, anticipando tensiones futuras.</p>
+        <p>En el plano laboral, se reactivaron las paritarias libres y el salario mínimo creció significativamente en términos reales. El empleo registrado creció de forma sostenida. El Programa Raíces repatrió cientificos que habían emigrado y se aumentó fuertemente el presupuesto del CONICET.</p>
+      </div>
+      <div class="callout">
+        <div class="callout-label">Debate: ¿Mérito o Viento a Favor?</div>
+        <p>Los críticos señalan que el crecimiento se debió más a la bonanza global de commodities y a condiciones heredadas (tipo de cambio post-devaluación, capacidad ociosa instalada) que a las políticas del gobierno. Los defensores argumentan que otros países de la región con las mismas condiciones externas tuvieron peores resultados, y que las políticas sociales y laborales marcaron una diferencia real.</p>
+      </div>
+    </div>
+    <div id="kirchner-his" class="tab-panel">
+      <div class="prose">
+        <p>La historiografía sobre Kirchner está aún en formación, dado que las fuentes primarias son recientes. Sin embargo, ya emergen interpretaciones contrastantes sobre su legado.</p>
+      </div>
+      <div class="debate">
+        <div class="debate-side pro"><div class="debate-side-label">Visión Progresista</div><p>Kirchner reconstruyó el Estado y la autoridad presidencial tras el colapso de 2001, redistribuyó el ingreso, avanzó en derechos humanos como ningún gobierno previo y fortaleció la autonomía de la política exterior argentina. Fue el comienzo de la "década ganada".</p></div>
+        <div class="debate-side con"><div class="debate-side-label">Visión Crítica</div><p>El crecimiento se apoyó en condiciones externas favorables más que en reformas estructurales. La discrecionalidad en el manejo de fondos públicos y la concentración del poder en el Ejecutivo sentaron bases institucionales problemáticas que se agravaron en las gestiones posteriores.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 8: CRISTINA KIRCHNER
+  ══════════════════════════════════════ -->
+  <div id="sec-cfk" class="section">
+    <div class="section-meta">Período VIII &nbsp;·&nbsp; 2007 – 2015</div>
+    <h2 class="section-title">Cristina Fernández de Kirchner</h2>
+    <p class="section-subtitle">Dos mandatos marcados por expansión de derechos, conflicto con el campo y restricción externa</p>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('cfk','pol',this)">Política</button>
+      <button class="tab-btn" onclick="showTab('cfk','eco',this)">Economía</button>
+      <button class="tab-btn" onclick="showTab('cfk','his',this)">Historiografía</button>
+    </div>
+    <div id="cfk-pol" class="tab-panel active">
+      <div class="prose">
+        <p>Cristina Fernández de Kirchner ganó las elecciones de 2007 con el <strong>45,3% de los votos</strong> en primera vuelta, siendo la primera mujer elegida presidenta en la historia argentina. Asumió con un nivel de popularidad alto pero enfrentó casi de inmediato el mayor conflicto de su gestión.</p>
+        <p>En 2008, el gobierno anunció la <strong>Resolución 125</strong>, que establecía retenciones móviles a las exportaciones agropecuarias según el precio internacional de la soja. La reacción del campo fue inmediata y masiva: cortes de rutas, desabastecimiento, cacerolazos en las ciudades. El conflicto duró más de cien días y terminó con la derrota del gobierno cuando el vicepresidente Julio Cobos desempató en el Senado votando "no positivo" en contra de la resolución. Fue la mayor crisis política de la era kirchnerista.</p>
+        <p>El segundo mandato (2011-2015), al que llegó con el <strong>54,1% de los votos</strong> —la mayor victoria individual de la historia democrática argentina—, estuvo marcado por medidas de alto impacto: <strong>matrimonio igualitario (2010)</strong> y ley de identidad de género (2012) bajo su primer mandato; estatización de YPF (2012) y ley de medios audiovisuales (Ley 26.522). También por el agravamiento de la restricción cambiaria, la imposición del "cepo" al dólar y el deterioro económico.</p>
+        <p>La muerte repentina de Néstor Kirchner en octubre de 2010 por un paro cardíaco truncó el proyecto de una alternancia matrimonial en el poder y condicionó la política argentina durante años.</p>
+      </div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-year">2008</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Conflicto con el campo — Resolución 125</div><div class="tl-desc">Retenciones móviles generan el mayor conflicto agrario desde la dictadura. El vicepresidente Cobos vota en contra del gobierno. Derrota política del kirchnerismo.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2010</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Matrimonio Igualitario y muerte de Néstor</div><div class="tl-desc">Argentina, quinto país en el mundo en legalizar el matrimonio entre personas del mismo sexo. Meses después, el 27 de octubre, muere Néstor Kirchner.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2012</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Estatización de YPF</div><div class="tl-desc">Se expropia el 51% de YPF en manos de la española Repsol. El objetivo: recuperar el control sobre el petróleo. Conflicto diplomático con España.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2012</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Cepo cambiario y deterioro económico</div><div class="tl-desc">Restricciones a la compra de dólares. Inflación creciente (superior al 25% anual, datos oficiales manipulados). Aparece la brecha entre dólar oficial y dólar blue.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2014</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Default técnico por "fondos buitre"</div><div class="tl-desc">Un fallo del juez Griesa en EEUU bloquea pagos a bonistas. Argentina entra en default técnico sin poder pagar a quienes sí aceptaron el canje de 2005.</div></div>
+        </div>
+      </div>
+    </div>
+    <div id="cfk-eco" class="tab-panel">
+      <div class="key-figures">
+        <div class="key-figure"><div class="kf-value">329→548</div><div class="kf-label">PBI en miles de millones USD (2007→2014)</div></div>
+        <div class="key-figure"><div class="kf-value">&gt;25%</div><div class="kf-label">Inflación real anual estimada desde 2012 (INDEC intervenido)</div></div>
+        <div class="key-figure"><div class="kf-value">2012</div><div class="kf-label">Año en que comenzó el deterioro económico acelerado</div></div>
+      </div>
+      <div class="prose">
+        <p>La economía kirchnerista tuvo dos fases bien diferenciadas. La primera (2007-2011) continuó el crecimiento del período anterior impulsado por los altos precios de la soja y el consumo interno. La segunda (2012-2015) mostró el agotamiento del modelo: inflación acelerada que el INDEC oficial intentaba ocultar, creciente déficit fiscal financiado con emisión monetaria, escasez de dólares y brecha cambiaria.</p>
+        <p>El gobierno respondió a la restricción externa con más controles: cepo al dólar, restricciones a las importaciones, y subsidios crecientes a la energía y el transporte que distorsionaron los precios relativos. Estas medidas postergaron el ajuste pero agravaron los desequilibrios estructurales que heredaría el siguiente gobierno.</p>
+      </div>
+    </div>
+    <div id="cfk-his" class="tab-panel">
+      <div class="debate">
+        <div class="debate-side pro"><div class="debate-side-label">Visión Kirchnerista</div><p>Los dos mandatos de CFK representan la mayor expansión de derechos sociales, laborales, civiles y de identidad de la historia argentina reciente. La estatización de YPF y las políticas sociales constituyeron una agenda soberana de desarrollo. Las dificultades económicas del segundo mandato fueron consecuencia del contexto internacional adverso (caída del precio de la soja, recesión brasileña) y de la herencia estructural irresolvible en tan poco tiempo.</p></div>
+        <div class="debate-side con"><div class="debate-side-label">Visión Opositora</div><p>La manipulación del INDEC fue una estafa institucional que impidió diagnosticar la realidad. El cepo y las restricciones cambiarias destruyeron reservas y generaron distorsiones profundas. El déficit fiscal financiado con emisión fue la semilla de la inflación crónica posterior. Las causas judiciales por corrupción (Vialidad, Hotesur) señalan irregularidades en la gestión del gasto público.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 9: MACRI
+  ══════════════════════════════════════ -->
+  <div id="sec-macri" class="section">
+    <div class="section-meta">Período IX &nbsp;·&nbsp; 2015 – 2019</div>
+    <h2 class="section-title">Mauricio Macri</h2>
+    <p class="section-subtitle">El giro liberal, el retorno al FMI y el colapso cambiario de 2018</p>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('macri','pol',this)">Política</button>
+      <button class="tab-btn" onclick="showTab('macri','eco',this)">Economía</button>
+      <button class="tab-btn" onclick="showTab('macri','his',this)">Historiografía</button>
+    </div>
+    <div id="macri-pol" class="tab-panel active">
+      <div class="prose">
+        <p>Mauricio Macri ganó el ballotage de 2015 con el <strong>51,4% de los votos</strong>, derrotando al candidato kirchnerista Daniel Scioli por un estrecho margen. Era la primera vez desde 1916 que un partido no peronista ganaba una elección presidencial en segunda vuelta. Macri representaba a Cambiemos, una coalición que incluía al PRO (su partido), la UCR y la Coalición Cívica.</p>
+        <p>El gobierno prometió un cambio gradual con "lluvia de inversiones". Eliminó el cepo cambiario el primer día, pagó a los "fondos buitre" —los holdouts que no habían aceptado los canjes de 2005 y 2010—, y comenzó un proceso de apertura y desregulación económica. El discurso oficial enfatizaba la modernización del Estado y la lucha contra la corrupción.</p>
+        <p>Sin embargo, la crisis cambiaria de 2018 —con una devaluación del 82% en pocos meses— terminó de desacreditar el proyecto económico. La derrota en las elecciones primarias (PASO) de agosto de 2019, donde Alberto Fernández le sacó 16 puntos, fue un cachetazo político que precipitó una nueva corrida cambiaria. Macri no logró la reelección y entregó el poder en diciembre de 2019.</p>
+      </div>
+    </div>
+    <div id="macri-eco" class="tab-panel">
+      <div class="key-figures">
+        <div class="key-figure"><div class="kf-value">USD 57 mil M</div><div class="kf-label">Préstamo del FMI en 2018 (record histórico)</div></div>
+        <div class="key-figure"><div class="kf-value">163%</div><div class="kf-label">Aumento de la deuda externa entre 2015 y 2019</div></div>
+        <div class="key-figure"><div class="kf-value">53%</div><div class="kf-label">Pobreza al final del mandato (vs 35% al inicio)</div></div>
+      </div>
+      <div class="prose">
+        <p>La política económica de Cambiemos combinó apertura comercial, reducción de retenciones agropecuarias, liberalización financiera y endeudamiento externo masivo. Los primeros dos años mostraron resultados mixtos: se redujo el déficit heredado pero la inflación no cedió. En 2017, año de elecciones legislativas, el gobierno aprovechó los buenos resultados para incrementar el gasto y ganar más bancas.</p>
+        <p>En 2018, la crisis llegó con una corrida cambiaria violenta. El gobierno de Macri recurrió entonces al <strong>FMI por un préstamo de 57.000 millones de dólares</strong>, el más grande en la historia del organismo. Ese dinero, según el informe posterior del propio FMI, fue en gran parte utilizado para financiar la fuga de capitales privados —que acumuló USD 88.000 millones durante el mandato—, no para estabilizar la economía productiva. El programa fue reconocido como fallido por el propio FMI en una evaluación posterior.</p>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-title">Deuda externa argentina y pobreza bajo Macri — 2015 a 2019</div>
+        <canvas id="chartMacri"></canvas>
+      </div>
+      <div class="callout danger">
+        <div class="callout-label">El FMI Reconoció el Fracaso</div>
+        <p>En 2021, el propio FMI publicó una evaluación que concluía que el programa con Macri "no cumplió con sus objetivos" y reconoció indirectamente que parte de los fondos financiaron la fuga de capitales. Una conclusión infrecuente para el organismo, que rara vez critica sus propios programas.</p>
+      </div>
+    </div>
+    <div id="macri-his" class="tab-panel">
+      <div class="debate">
+        <div class="debate-side lib2"><div class="debate-side-label">Visión Pro-Macri</div><p>Macri intentó corregir décadas de distorsiones acumuladas sin caer en el shock. Normalizó las relaciones con el mundo, eliminó el cepo y pagó la deuda litigiosa. El fracaso se debe a la herencia kirchnerista y a shocks externos (subida de tasas de la Fed, devaluación brasileña). Las reformas eran necesarias aunque dolorosas.</p></div>
+        <div class="debate-side rev"><div class="debate-side-label">Visión Crítica</div><p>El endeudamiento masivo y la fuga de capitales demostraron que el proyecto fue un fracaso por diseño: liberó los mercados de capitales sin las condiciones de competitividad necesarias. La deuda con el FMI condicionó Argentina por años. La pobreza subió del 35% al 53%. En 3 de 4 años la economía cayó.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 10: ALBERTO FERNÁNDEZ
+  ══════════════════════════════════════ -->
+  <div id="sec-alberto" class="section">
+    <div class="section-meta">Período X &nbsp;·&nbsp; 2019 – 2023</div>
+    <h2 class="section-title">Alberto Fernández</h2>
+    <p class="section-subtitle">Pandemia, renegociación de la deuda y el desmoronamiento de la coalición</p>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('alberto','pol',this)">Política</button>
+      <button class="tab-btn" onclick="showTab('alberto','eco',this)">Economía</button>
+      <button class="tab-btn" onclick="showTab('alberto','his',this)">Historiografía</button>
+    </div>
+    <div id="alberto-pol" class="tab-panel active">
+      <div class="prose">
+        <p>Alberto Fernández ganó las elecciones de 2019 con el <strong>48% de los votos en primera vuelta</strong>, acompañado por Cristina Fernández de Kirchner como vicepresidenta —una fórmula que invertía el orden de poder simbólico habitual. Fernández, abogado y ex jefe de Gabinete de Néstor Kirchner, se presentaba como un candidato de síntesis capaz de unir al peronismo y gestionar la herencia macrista.</p>
+        <p>Los primeros meses de gobierno estuvieron dominados por la negociación de la deuda con acreedores privados y el FMI. Pero en marzo de 2020 llegó la <strong>pandemia de COVID-19</strong>, que transformó completamente la agenda. Argentina implementó uno de los aislamientos más prolongados del mundo (ASPO), con consecuencias económicas devastadoras: el PBI cayó un 9,9% en 2020.</p>
+        <p>La gestión de la pandemia fue objeto de controversia permanente: el gobierno fue criticado tanto por el exceso de restricciones como por el escándalo del llamado <strong>"Olivosgate"</strong> (julio de 2020), cuando se supo que el presidente había organizado una fiesta de cumpleaños en la Quinta de Olivos durante el período de cuarentena más estricta, violando las propias restricciones que él había decretado.</p>
+        <p>La relación con Cristina Kirchner fue deteriorándose progresivamente. Las diferencias internas del Frente de Todos se volvieron públicas e irreconciliables. Fernández anunció en 2023 que no buscaría la reelección, dejando un partido peronista fragmentado y sin liderazgo claro frente a la emergencia de Javier Milei.</p>
+      </div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-year">2020</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Pandemia COVID-19 y ASPO</div><div class="tl-desc">Uno de los aislamientos más prolongados del mundo. El PBI cae 9,9%. La pandemia agrava la crisis heredada de Macri y bloquea cualquier agenda económica.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2020</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Reestructuración de deuda con privados</div><div class="tl-desc">Se logra un acuerdo con el 93% de los bonistas privados por USD 68.843 millones. Próximo desafío: renegociar los USD 44.000 millones con el FMI.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2022</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Acuerdo con el FMI</div><div class="tl-desc">Se firma un acuerdo de Facilidades Extendidas por USD 44.000 millones. Reprogramación gradual sin shock, con revisiones trimestrales y condicionamientos fiscales.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2022</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">"Olivosgate" y crisis política interna</div><div class="tl-desc">El escándalo de la fiesta en la Quinta debilita a Fernández. Cristina Kirchner critica abiertamente al gobierno. Renuncias en el gabinete. La coalición se fragmenta.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2023</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Inflación del 211% anual y derrota de Massa</div><div class="tl-desc">El ministro Sergio Massa asume también como candidato presidencial. Pierde el ballotage ante Milei con el 44,3% de los votos.</div></div>
+        </div>
+      </div>
+    </div>
+    <div id="alberto-eco" class="tab-panel">
+      <div class="key-figures">
+        <div class="key-figure"><div class="kf-value">211%</div><div class="kf-label">Inflación anual al cierre de 2023</div></div>
+        <div class="key-figure"><div class="kf-value">-9,9%</div><div class="kf-label">Caída del PBI en 2020 por pandemia</div></div>
+        <div class="key-figure"><div class="kf-value">40%</div><div class="kf-label">Pobreza en el primer semestre de 2023</div></div>
+      </div>
+      <div class="prose">
+        <p>La política económica de Fernández estuvo atrapada entre la herencia macrista (deuda impagable), la pandemia y las tensiones internas de su coalición. La economía rebotó en 2021 tras el colapso de 2020, pero el crecimiento no se tradujo en mejoras sociales duraderas porque la inflación erosionaba los aumentos de ingresos.</p>
+        <p>El acuerdo con el FMI de marzo de 2022 impuso metas fiscales que el gobierno fue incumpliendo progresivamente. La inflación se aceleró durante 2022 y 2023, alcanzando los tres dígitos anuales por primera vez desde la hiperinflación de 1989-1990. El cepo cambiario se mantuvo y profundizó, generando múltiples tipos de cambio y distorsiones graves en la asignación de recursos.</p>
+        <p>En agosto de 2023, en un contexto de corrida cambiaria, el ministro Massa devaluó el peso en un 18% en un solo día como parte de las condiciones del acuerdo con el FMI. Para diciembre de 2023, Argentina llegaba a la transición con una inflación mensual del 25,5% —la más alta en 32 años— y reservas netas del Banco Central en terreno negativo.</p>
+      </div>
+    </div>
+    <div id="alberto-his" class="tab-panel">
+      <div class="prose">
+        <p>El gobierno de Alberto Fernández es aún muy reciente para que exista historiografía consolidada, pero sí hay análisis políticos y económicos que permiten identificar los ejes del debate.</p>
+      </div>
+      <div class="debate">
+        <div class="debate-side pro"><div class="debate-side-label">Visión Oficial</div><p>El gobierno enfrentó la peor pandemia del siglo y una herencia de deuda impagable. La reestructuración de la deuda con privados fue un logro técnico importante. El crecimiento de 2021-2022 fue real. Las limitaciones fueron externas e impuestas por el FMI, no por voluntad propia.</p></div>
+        <div class="debate-side con"><div class="debate-side-label">Visión Crítica</div><p>La gestión de la pandemia fue excesivamente restrictiva y generó daños económicos y educativos desproporcionados. La inflación fue consecuencia directa de la emisión monetaria para financiar el gasto. Los escándalos internos (Olivosgate) erosionaron la credibilidad. El gobierno dejó el país con la inflación más alta en décadas.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 11: JAVIER MILEI
+  ══════════════════════════════════════ -->
+  <div id="sec-milei" class="section">
+    <div class="section-meta">Período XI &nbsp;·&nbsp; 2023 – presente (2026)</div>
+    <h2 class="section-title">Javier Milei</h2>
+    <p class="section-subtitle">La irrupción libertaria, el ajuste más drástico de la historia moderna y la estabilización macroeconómica</p>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('milei','pol',this)">Política</button>
+      <button class="tab-btn" onclick="showTab('milei','eco',this)">Economía</button>
+      <button class="tab-btn" onclick="showTab('milei','his',this)">Historiografía</button>
+    </div>
+    <div id="milei-pol" class="tab-panel active">
+      <div class="prose">
+        <p>Javier Milei es un economista y divulgador mediático que irrumpió en la política electoral en 2021, presentándose como candidato a diputado por la Ciudad de Buenos Aires bajo el partido <strong>La Libertad Avanza</strong>, creado ese mismo año. Su ascenso fue meteórico: en las PASO de agosto de 2023 obtuvo el 30% de los votos a nivel nacional, superando a los dos bloques tradicionales (kirchnerismo y Juntos por el Cambio), y en el ballotage de noviembre de 2023 derrotó al peronista Sergio Massa con el <strong>55,6% de los votos</strong> —el mayor porcentaje para un candidato en segunda vuelta desde el retorno democrático.</p>
+        <p>Su discurso político se caracterizó por la confrontación radical con "la casta" (clase política tradicional), la reivindicación del libre mercado extremo, el rechazo al feminismo y al cambio climático como "agenda globalista", y una alineación explícita con Israel y los Estados Unidos. Es el primer presidente de Argentina que no proviene del peronismo ni del radicalismo desde la apertura democrática de 1983.</p>
+        <p>Sin mayoría propia en el Congreso, Milei gobernó mediante decretos de necesidad y urgencia y negociaciones puntuales. La <strong>Ley de Bases</strong> —versión reducida de su original "ley ómnibus" de 600 medidas— fue aprobada en junio de 2024 tras meses de conflicto parlamentario, con reformas de desregulación económica y el Régimen de Incentivo a las Grandes Inversiones (RIGI). En las elecciones legislativas de octubre de 2025, La Libertad Avanza obtuvo el 41% de los votos, convirtiéndose en la primera minoría parlamentaria.</p>
+        <p>Las <strong>acusaciones de corrupción</strong> que afectaron a su círculo cercano —incluyendo a su hermana y jefa operativa del partido, Karina Milei— y el escándalo con la criptomoneda LIBRA (febrero de 2025, donde el presidente promovió un activo digital que luego se desplomó) generaron una crisis de credibilidad que afectó su imagen, aunque no detuvo su rendimiento electoral.</p>
+      </div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-year">Dic 2023</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Asunción y devaluación inmediata</div><div class="tl-desc">Milei asume y devalúa el peso de $366 a $800 en su primer día. Inflación de diciembre: 25,5% mensual. Se anuncia el "ajuste más grande de la historia".</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">Ene 2024</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Decreto 70/2023 — Desregulación masiva</div><div class="tl-desc">Más de 300 medidas desreguladoras: derogación ley de alquileres, política de cielos abiertos, eliminación de organismos del Estado. Apelado judicialmente por la oposición.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">Jun 2024</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Aprobación de la Ley de Bases</div><div class="tl-desc">Tras meses de conflicto parlamentario, se aprueba una versión reducida de la ley ómnibus. Incluye el RIGI (incentivos para grandes inversiones extranjeras).</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">Feb 2025</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Escándalo LIBRA</div><div class="tl-desc">Milei promueve en redes la criptomoneda LIBRA. Su precio colapsa horas después. Inversores pierden millones. Crisis política y pedidos de juicio político en el Congreso.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">Oct 2025</div><div class="tl-dot"></div>
+          <div class="tl-content"><div class="tl-event">Victoria legislativa — 41% en las elecciones</div><div class="tl-desc">La Libertad Avanza obtiene el 41% de los votos, superando al peronismo (32%). Se convierte en la primera minoría parlamentaria por primera vez en su historia.</div></div>
+        </div>
+      </div>
+    </div>
+    <div id="milei-eco" class="tab-panel">
+      <div class="key-figures">
+        <div class="key-figure"><div class="kf-value">211%→31%</div><div class="kf-label">Inflación anual dic 2023 → dic 2025</div></div>
+        <div class="key-figure"><div class="kf-value">Superávit</div><div class="kf-label">Resultado fiscal primario positivo, primero en 14 años (2024)</div></div>
+        <div class="key-figure"><div class="kf-value">53%→32%</div><div class="kf-label">Pobreza máxima (1er sem. 2024) → mínimo (1er sem. 2025)</div></div>
+      </div>
+      <div class="prose">
+        <p>La política económica de Milei representa el mayor ajuste fiscal de la historia moderna argentina, equivalente a una reducción de aproximadamente <strong>15 puntos del PBI</strong> en el gasto público en el primer año. Los instrumentos fueron: eliminación de subsidios a la energía y el transporte, reducción drástica del personal del Estado (56.000 despidos en los primeros dos años), congelamiento de la obra pública, y eliminación del financiamiento monetario al Tesoro.</p>
+        <p>Los resultados macroeconómicos fueron significativos: la inflación mensual cayó del 25,5% en diciembre de 2023 al 2,3% en octubre de 2025 (la más baja desde 2018), y el presupuesto registró superávit fiscal primario por primera vez en 14 años. El PBI creció un 4,5% en 2025 (estimación del FMI), y las reservas del Banco Central comenzaron a recuperarse.</p>
+        <p>Sin embargo, el costo social fue elevado: la tasa de pobreza llegó al <strong>53% en el primer semestre de 2024</strong>, el nivel más alto en décadas, como consecuencia directa de la devaluación, el ajuste de subsidios y la caída del salario real. Desde entonces, la pobreza comenzó a bajar a medida que la economía se recuperaba, llegando al 32% en el primer semestre de 2025. La desigualdad también aumentó transitoriamente antes de comenzar a descender.</p>
+        <p>En el plano estructural, el gobierno impulsó el RIGI, que atrajo compromisos de inversión en minería y energía por más de USD 31.000 millones. La eliminación del cepo cambiario (abril de 2025) y la unificación del tipo de cambio fueron presentadas como el inicio de una nueva etapa, aunque la fragilidad de las reservas sigue siendo un factor de riesgo.</p>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-title">Inflación mensual Argentina — Herencia y gestión Milei (2023–2025)</div>
+        <canvas id="chartMilei"></canvas>
+      </div>
+      <div class="callout">
+        <div class="callout-label">El Dilema del Ajuste</div>
+        <p>El ajuste de Milei logró resultados macroeconómicos en plazos insólitamente cortos, pero con un costo social real y verificable. El debate central no es si la inflación bajó —bajó—, sino si el modelo de ajuste era el único posible y si sus costos distributivos eran inevitables o eran consecuencia de opciones políticas específicas sobre quién pagaba el ajuste.</p>
+      </div>
+    </div>
+    <div id="milei-his" class="tab-panel">
+      <div class="prose">
+        <p>Por la cercanía temporal, no existe aún historiografía consolidada sobre Milei. Lo que sí existe es un debate político e ideológico muy intenso, que refleja la profunda polarización de la sociedad argentina.</p>
+      </div>
+      <div class="debate">
+        <div class="debate-side pro"><div class="debate-side-label">Visión Libertaria / Pro-Milei</div><p>Milei hizo lo que nadie se había atrevido: bajar la inflación con disciplina fiscal real, no con controles de precios. Desreguló una economía asfixiada por décadas de intervencionismo. El costo social transitorio es inevitable cuando se sale de una situación de desequilibrios acumulados. Las inversiones en el RIGI y la estabilidad macroeconómica sientan las bases de un crecimiento sostenible.</p></div>
+        <div class="debate-side pop"><div class="debate-side-label">Visión Crítica / Peronista</div><p>El ajuste recayó sobre los sectores más vulnerables: jubilados, beneficiarios de planes sociales, trabajadores del Estado. El aumento de la pobreza al 53% no es un "costo transitorio" sino una política deliberada de redistribución regresiva. El desmantelamiento del Estado es irreversible y afecta capacidades que tardaron décadas en construirse.</p></div>
+      </div>
+      <div class="callout">
+        <div class="callout-label">Contexto Histórico — Fenómeno Global</div>
+        <p>La aparición de Milei no es un fenómeno exclusivamente argentino. Forma parte de una tendencia global de irrupción de liderazgos outsider que canalizan el descontento con los partidos tradicionales. Lo peculiar del caso argentino es la radicalidad ideológica del personaje y la profundidad del ajuste implementado en contexto democrático.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 12: MITOS Y CONCLUSIONES
+  ══════════════════════════════════════ -->
+  <div id="sec-mitos" class="section">
+    <div class="section-meta">Síntesis Final</div>
+    <h2 class="section-title">Mitos y Conclusiones</h2>
+    <p class="section-subtitle">Lo que la historia desmiente y los patrones que se repiten a lo largo de 140 años</p>
+
+    <div class="prose" style="margin-bottom: 34px;">
+      <p>La historia argentina del siglo XX y principios del XXI es, en esencia, la historia de una <strong>puja distributiva nunca resuelta</strong>, una fragilidad institucional recurrente y una economía que no logra superar su dependencia estructural de las materias primas. Entender sus mitos es fundamental para no repetirlos.</p>
+    </div>
+
+    <div class="myth">
+      <span class="myth-tag mito">Mito</span>
+      <h3>"Antes de 1930 Argentina era una potencia mundial"</h3>
+      <p>El PBI per cápita era elevado para la época, pero ese indicador ocultaba una desigualdad extrema, concentración de la tierra en pocas manos y ausencia total de industria básica. Era prosperidad dependiente de los precios internacionales y del capital extranjero. Un shock externo —como el de 1929— bastaba para derrumbarla. La "potencia" no tenía fundamentos propios.</p>
+    </div>
+
+    <div class="myth">
+      <span class="myth-tag mito">Mito</span>
+      <h3>"El peronismo inventó la inflación argentina"</h3>
+      <p>La inflación de dos dígitos comenzó en 1949, pero las crisis hiperinflacionarias ocurrieron décadas después: la de 1989 fue bajo Alfonsín (radical), la de 1990 bajo Menem. La inflación del 211% de 2023 fue bajo Fernández. La inflación es un fenómeno estructural ligado al conflicto distributivo, el déficit fiscal y la emisión monetaria, presente en gobiernos de todos los signos políticos.</p>
+    </div>
+
+    <div class="myth">
+      <span class="myth-tag mito">Mito</span>
+      <h3>"La dictadura fue una guerra entre dos terrorismos iguales"</h3>
+      <p>La "teoría de los dos demonios" fue desacreditada por la investigación histórica. El Estado implementó un plan sistemático y masivo de exterminio —con presupuesto, jerarquía y coordinación estatal— que no puede equipararse en escala ni en naturaleza con la acción de organizaciones guerrilleras previas. Los juicios, que continúan hasta hoy, lo confirman permanentemente.</p>
+    </div>
+
+    <div class="myth">
+      <span class="myth-tag mito">Mito</span>
+      <h3>"La crisis de 2001 fue solo consecuencia de la corrupción"</h3>
+      <p>La corrupción existió, pero la crisis tuvo causas estructurales más profundas: un tipo de cambio sobrevaluado que destruyó la competitividad, una deuda en moneda extranjera insostenible, y el ajuste procíclico del FMI en plena recesión. Reducirla a la corrupción es una simplificación que impide aprender las lecciones económicas reales del período.</p>
+    </div>
+
+    <div class="myth">
+      <span class="myth-tag mito">Mito</span>
+      <h3>"El kirchnerismo destruyó la economía que Macri recibió sana"</h3>
+      <p>Cuando Macri asumió en 2015, había problemas serios (inflación, cepo, déficit fiscal), pero la deuda externa era relativamente baja y la economía tenía fundamentos. Macri entregó el poder en 2019 con una deuda que había crecido un 163%, el FMI involucrado por primera vez desde 2001, una recesión de dos años y la pobreza subida del 35% al 53%. El relato de "la herencia recibida" siempre oscurece más de lo que ilumina.</p>
+    </div>
+
+    <div class="myth">
+      <span class="myth-tag mito">Mito</span>
+      <h3>"Milei es un fenómeno sin precedentes en Argentina"</h3>
+      <p>La irrupción de outsiders que canalizan el descontento con la "clase política" tiene antecedentes en la historia argentina y en toda América Latina. Lo novedoso en Milei es la coherencia ideológica extrema (anarcocapitalismo académico), su origen en el mundo de los medios y las redes sociales, y la profundidad del ajuste que logró implementar en democracia. El fenómeno tiene raíces en el agotamiento acumulado de décadas de promesas incumplidas.</p>
+    </div>
+
+    <div style="margin-top: 46px; padding-top: 30px; border-top: 1px solid var(--border);">
+      <div class="section-meta" style="margin-bottom: 14px;">Patrón Recurrente</div>
+      <div class="callout">
+        <div class="callout-label">La Constante Histórica (1880–2026)</div>
+        <p>A lo largo de 140 años, Argentina mostró una incapacidad recurrente para construir coaliciones de largo plazo que resolvieran democráticamente la distribución de la renta. Cuando la política fallaba, llegaban los golpes. Cuando los actores económicos no acordaban, llegaba la crisis. Cada gobierno hereda los problemas irresueltos del anterior y los agrava con sus propias soluciones parciales. Comprender este patrón es el primer paso para eventualmente romperlo.</p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // ── NAVEGACIÓN PRINCIPAL ──
+  function showSection(id, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    document.getElementById('sec-' + id).classList.add('active');
+    btn.classList.add('active');
+
+    if (id === 'dictadura') setTimeout(renderDeuda, 50);
+    if (id === 'crisis2001') setTimeout(renderInf, 50);
+    if (id === 'macri') setTimeout(renderMacri, 50);
+    if (id === 'milei') setTimeout(renderMilei, 50);
+  }
+
+  // ── TABS ──
+  function showTab(section, tab, btn) {
+    const sec = document.getElementById('sec-' + section);
+    sec.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    sec.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(section + '-' + tab).classList.add('active');
+    btn.classList.add('active');
+
+    if (section === 'dictadura' && tab === 'eco') setTimeout(renderDeuda, 50);
+    if (section === 'crisis2001' && tab === 'eco') setTimeout(renderInf, 50);
+    if (section === 'macri' && tab === 'eco') setTimeout(renderMacri, 50);
+    if (section === 'milei' && tab === 'eco') setTimeout(renderMilei, 50);
+  }
+
+  // ── MODO CLARO/OSCURO ──
+  function toggleTheme() {
+    const html = document.documentElement;
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    document.getElementById('themeIcon').textContent = isDark ? '🌙' : '☀️';
+    document.getElementById('themeLabel').textContent = isDark ? 'Modo Oscuro' : 'Modo Claro';
+    // Redraw charts with new colors
+    destroyCharts();
+    if (document.getElementById('sec-dictadura').classList.contains('active')) renderDeuda();
+    if (document.getElementById('sec-crisis2001').classList.contains('active')) renderInf();
+    if (document.getElementById('sec-macri').classList.contains('active')) renderMacri();
+    if (document.getElementById('sec-milei').classList.contains('active')) renderMilei();
+  }
+
+  // ── CHART HELPERS ──
+  const chartInstances = {};
+
+  function getChartColors() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    return {
+      grid: isDark ? '#2e2b26' : '#ddd6c8',
+      tick: isDark ? '#5a5650' : '#7a7268',
+      legend: isDark ? '#8a8278' : '#4a4540',
+      gold: '#c9a84c',
+      red: '#b34040',
+      blue: '#4a7cb5',
+      green: '#4a9b6a'
+    };
+  }
+
+  function destroyCharts() {
+    Object.keys(chartInstances).forEach(k => {
+      if (chartInstances[k]) { chartInstances[k].destroy(); chartInstances[k] = null; }
+    });
+  }
+
+  function baseOptions(c) {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: c.legend, font: { size: 11, family: "'Source Serif 4', serif" } } } },
+      scales: {
+        x: { ticks: { color: c.tick, font: { size: 10 } }, grid: { color: c.grid } },
+        y: { ticks: { color: c.tick, font: { size: 10 } }, grid: { color: c.grid } }
+      }
+    };
+  }
+
+  function renderDeuda() {
+    if (chartInstances.deuda) return;
+    const c = getChartColors();
+    const ctx = document.getElementById('chartDeuda').getContext('2d');
+    chartInstances.deuda = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['1975', '1976', '1979', '1981', '1983'],
+        datasets: [{ label: 'Deuda externa (miles de millones USD)', data: [8, 10, 19, 35, 45], backgroundColor: 'rgba(179,64,64,0.72)', borderColor: c.red, borderWidth: 1 }]
+      },
+      options: baseOptions(c)
+    });
+  }
+
+  function renderInf() {
+    if (chartInstances.inf) return;
+    const c = getChartColors();
+    const ctx = document.getElementById('chartInf').getContext('2d');
+    chartInstances.inf = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['1998', '1999', '2000', '2001', '2002', '2003'],
+        datasets: [{ label: 'Inflación anual (%)', data: [0.7, -1.8, -0.7, -1.5, 41, 3.7], borderColor: c.gold, backgroundColor: 'rgba(201,168,76,0.08)', tension: 0.3, pointBackgroundColor: c.gold, borderWidth: 2 }]
+      },
+      options: baseOptions(c)
+    });
+  }
+
+  function renderMacri() {
+    if (chartInstances.macri) return;
+    const c = getChartColors();
+    const ctx = document.getElementById('chartMacri').getContext('2d');
+    chartInstances.macri = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['2015', '2016', '2017', '2018', '2019'],
+        datasets: [
+          { label: 'Deuda externa (miles de millones USD)', data: [158, 192, 235, 277, 277], borderColor: c.red, backgroundColor: 'rgba(179,64,64,0.07)', tension: 0.3, pointBackgroundColor: c.red, borderWidth: 2, yAxisID: 'y' },
+          { label: 'Pobreza (%)', data: [35, 30, 28, 32, 35], borderColor: c.blue, backgroundColor: 'rgba(74,124,181,0.07)', tension: 0.3, pointBackgroundColor: c.blue, borderWidth: 2, yAxisID: 'y2', borderDash: [5,3] }
+        ]
+      },
+      options: {
+        ...baseOptions(c),
+        scales: {
+          x: { ticks: { color: c.tick, font: { size: 10 } }, grid: { color: c.grid } },
+          y: { type: 'linear', position: 'left', ticks: { color: c.tick, font: { size: 10 } }, grid: { color: c.grid }, title: { display: true, text: 'Deuda (miles de M USD)', color: c.tick, font: { size: 10 } } },
+          y2: { type: 'linear', position: 'right', ticks: { color: c.tick, font: { size: 10 } }, grid: { drawOnChartArea: false }, title: { display: true, text: 'Pobreza (%)', color: c.tick, font: { size: 10 } } }
+        }
+      }
+    });
+  }
+
+  function renderMilei() {
+    if (chartInstances.milei) return;
+    const c = getChartColors();
+    const ctx = document.getElementById('chartMilei').getContext('2d');
+    chartInstances.milei = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Nov 23', 'Dic 23', 'Ene 24', 'Feb 24', 'Mar 24', 'Abr 24', 'May 24', 'Jun 24', 'Sep 24', 'Dic 24', 'Mar 25', 'Jun 25', 'Oct 25'],
+        datasets: [{ label: 'Inflación mensual (%)', data: [12.8, 25.5, 20.6, 13.2, 11.0, 8.8, 4.2, 4.6, 3.5, 2.7, 3.7, 3.3, 2.3], borderColor: c.gold, backgroundColor: 'rgba(201,168,76,0.1)', tension: 0.4, pointBackgroundColor: c.gold, pointRadius: 4, borderWidth: 2.5, fill: true }]
+      },
+      options: baseOptions(c)
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historia Argentina: Análisis Historiográfico y Político (1880-2001)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        archive: {
+                            bg: '#fbfaf8',
+                            paper: '#ffffff',
+                            text: '#1e293b',
+                            muted: '#475569',
+                            accent: '#b45309', // amber-700
+                            border: '#e2e8f0'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Merriweather', 'Georgia', 'serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    },
+                    animation: {
+                        fadeIn: 'fadeIn 0.4s ease-out forwards'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(5px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #fbfaf8; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+        }
+        
+        @media (min-width: 768px) {
+            .chart-container { height: 400px; }
+        }
+    </style>
+
+    <!-- Chosen Palette: Academic Archive (Stone/Archive-bg background, Slate for text, Amber/Accent for interactive elements) -->
+    <!-- Application Structure Plan: Una SPA con panel dividido. A la izquierda, navegación cronológica persistente. A la derecha, el área principal de contenido. Cada período histórico (sección) contiene su propio sistema de pestañas internas (Contexto, Economía, Debate) gestionado por JS nativo y clases de utilidad de Tailwind (hidden/block) para evitar sobrecarga cognitiva y estructurar el análisis profundo sin requerir scroll infinito. -->
+    <!-- Visualization & Content Choices: 
+         1. Sistema de Pestañas (Tabs) -> Objetivo: Organizar texto extenso -> Método: HTML/JS -> Justificación: Permite al usuario desglosar la historia por dimensiones (política, economía, historiografía) a su propio ritmo.
+         2. Gráfico de Deuda (1976-1983) -> Objetivo: Mostrar impacto estructural -> Método: Chart.js Bar Chart -> Justificación: Cuantifica visualmente la política de valorización financiera sin usar SVG.
+         3. Gráfico de Inflación (1998-2002) -> Objetivo: Explicar el colapso de la Convertibilidad -> Método: Chart.js Line Chart -> Justificación: Evidencia la deflación previa al estallido hiperinflacionario de 2002.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-archive-bg text-archive-text font-serif antialiased h-screen overflow-hidden flex flex-col md:flex-row selection:bg-archive-accent selection:text-white">
+
+    <!-- Mobile Header -->
+    <header class="md:hidden bg-slate-900 text-white p-4 flex justify-between items-center z-30 shadow-md">
+        <h1 class="text-lg font-bold font-sans">Archivo Histórico Argentino</h1>
+        <button id="mobile-menu-btn" class="text-white font-sans border border-white px-3 py-1 rounded text-sm hover:bg-slate-800 transition-colors">Menú</button>
+    </header>
+
+    <!-- Sidebar Navigation -->
+    <nav id="sidebar" class="hidden md:flex flex-col w-full md:w-80 bg-slate-100 border-r border-archive-border h-full absolute md:relative z-20 overflow-y-auto transition-transform duration-300 shadow-xl md:shadow-none">
+        <div class="p-6 hidden md:block border-b border-archive-border bg-slate-50">
+            <h1 class="text-xl font-bold font-sans text-slate-900 leading-tight">Análisis Historiográfico Argentino</h1>
+            <p class="text-xs font-sans text-slate-500 mt-2 uppercase tracking-wide font-bold">1880 - 2001</p>
+        </div>
+        <div class="flex flex-col w-full font-sans text-sm font-medium">
+            <button onclick="navMain('sec-pre1930', this)" class="nav-btn active bg-archive-accent text-white border-l-4 border-amber-900 text-left px-6 py-4 hover:bg-amber-600 transition-colors">1. Pre-1930: Agroexportación y Radicalismo</button>
+            <button onclick="navMain('sec-decada_infame', this)" class="nav-btn text-slate-600 border-l-4 border-transparent text-left px-6 py-4 hover:bg-slate-200 border-b border-archive-border transition-colors">2. Década Infame (1930-1943)</button>
+            <button onclick="navMain('sec-peronismo', this)" class="nav-btn text-slate-600 border-l-4 border-transparent text-left px-6 py-4 hover:bg-slate-200 border-b border-archive-border transition-colors">3. Peronismo Clásico (1943-1955)</button>
+            <button onclick="navMain('sec-inestabilidad', this)" class="nav-btn text-slate-600 border-l-4 border-transparent text-left px-6 py-4 hover:bg-slate-200 border-b border-archive-border transition-colors">4. Inestabilidad y Violencia (1955-1976)</button>
+            <button onclick="navMain('sec-dictadura', this)" class="nav-btn text-slate-600 border-l-4 border-transparent text-left px-6 py-4 hover:bg-slate-200 border-b border-archive-border transition-colors">5. Dictadura Militar (1976-1983)</button>
+            <button onclick="navMain('sec-crisis2001', this)" class="nav-btn text-slate-600 border-l-4 border-transparent text-left px-6 py-4 hover:bg-slate-200 border-b border-archive-border transition-colors">6. Crisis de 2001 y De la Rúa</button>
+            <button onclick="navMain('sec-conclusion', this)" class="nav-btn text-slate-600 border-l-4 border-transparent text-left px-6 py-4 hover:bg-slate-800 hover:text-white bg-slate-800 text-white border-b border-archive-border transition-colors mt-auto">Conclusión y Mitos</button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="main-scroll-area" class="flex-1 h-full overflow-y-auto bg-archive-bg relative scroll-smooth p-6 md:p-12">
+        <div class="max-w-4xl mx-auto pb-24">
+
+            <!-- SECTION 1: PRE 1930 -->
+            <section id="sec-pre1930" class="page-section block animate-fadeIn">
+                <header class="mb-8 border-b border-archive-border pb-6">
+                    <h2 class="text-4xl font-bold text-slate-900 mb-2">1. La Argentina Pre-1930</h2>
+                    <p class="text-archive-muted text-lg italic">El Modelo Agroexportador, el Régimen Conservador y el Ascenso del Radicalismo.</p>
+                </header>
+                
+                <p class="mb-6 leading-relaxed text-lg text-slate-700">Esta sección introduce las bases estructurales de la Argentina moderna. Comprender el período entre 1880 y 1930 es vital, ya que aquí se forjó la matriz económica dependiente de las exportaciones y se dio la primera transición democrática. Exploraremos cómo la riqueza macroeconómica convivía con la exclusión política.</p>
+
+                <!-- Inner Tabs Navigation -->
+                <div class="flex flex-wrap border-b border-archive-border mb-8 font-sans">
+                    <button class="tab-btn px-4 py-3 font-bold text-archive-accent border-b-2 border-archive-accent hover:bg-slate-50 transition-colors" onclick="openInnerTab('sec-pre1930', 'tab-pre1930-pol', this)">Contexto y Política</button>
+                    <button class="tab-btn px-4 py-3 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-800 hover:bg-slate-50 transition-colors" onclick="openInnerTab('sec-pre1930', 'tab-pre1930-eco', this)">Economía</button>
+                    <button class="tab-btn px-4 py-3 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-800 hover:bg-slate-50 transition-colors" onclick="openInnerTab('sec-pre1930', 'tab-pre1930-his', this)">Debate Historiográfico</button>
+                </div>
+
+                <!-- Inner Tabs Content -->
+                <div id="tab-pre1930-pol" class="tab-content block animate-fadeIn space-y-5 leading-relaxed text-slate-800">
+                    <h3 class="text-2xl font-bold font-sans text-slate-900">La Generación del 80 y el PAN</h3>
+                    <p>Entre 1880 y 1916, Argentina fue gobernada por el Partido Autonomista Nacional (PAN), una élite conservadora que impulsó el lema "Paz y Administración". Ideológicamente liberales en lo económico pero conservadores y restrictivos en lo político, mantuvieron el poder mediante el fraude electoral institucionalizado. Fomentaron la inmigración masiva europea, la educación laica (Ley 1420) y la integración territorial.</p>
+                    
+                    <h3 class="text-2xl font-bold font-sans text-slate-900 mt-8">La Ley Sáenz Peña y el Radicalismo (1912-1930)</h3>
+                    <p>La presión de nuevas clases medias urbanas (hijos de inmigrantes) y las revoluciones armadas de la Unión Cívica Radical (UCR) forzaron a la élite a sancionar la <strong>Ley Sáenz Peña (1912)</strong>, que estableció el voto universal (masculino), secreto y obligatorio. Esto llevó al poder a <strong>Hipólito Yrigoyen (1916)</strong>.</p>
+                    <div class="bg-white p-5 rounded border border-archive-border shadow-sm mt-4">
+                        <h4 class="font-bold font-sans text-archive-accent mb-2">Acciones y Resultados Prácticos:</h4>
+                        <p class="text-sm">El Yrigoyenismo representó la democratización política y la incorporación de las clases medias al Estado mediante el empleo público. Sin embargo, en la práctica, Yrigoyen utilizó frecuentemente la intervención federal para controlar provincias opositoras. En lo social, tuvo posturas ambivalentes: medió a favor de los obreros en algunas huelgas, pero reprimió brutalmente otras (Semana Trágica de 1919, Patagonia Rebelde de 1921).</p>
+                    </div>
+                </div>
+
+                <div id="tab-pre1930-eco" class="tab-content hidden animate-fadeIn space-y-5 leading-relaxed text-slate-800">
+                    <h3 class="text-2xl font-bold font-sans text-slate-900">El Modelo Agroexportador (MAE)</h3>
+                    <p>Argentina se integró a la división internacional del trabajo como proveedora de materias primas (carne, cereales) a Gran Bretaña, importando manufacturas y capitales (ferrocarriles).</p>
+                    <ul class="list-disc pl-6 space-y-3 mt-4 text-slate-700 bg-slate-50 p-6 rounded-lg border border-slate-200">
+                        <li><strong class="text-slate-900">Resultados a corto plazo:</strong> Crecimiento del PBI a tasas altísimas (superiores al 5% anual). Argentina se convirtió en uno de los países con mayor PBI per cápita del mundo.</li>
+                        <li><strong class="text-slate-900">Vulnerabilidad a largo plazo:</strong> Dependencia extrema de los ciclos económicos externos. La propiedad de la tierra (latifundios en la Pampa Húmeda) generó una fuerte desigualdad en la distribución de la riqueza.</li>
+                        <li><strong class="text-slate-900">Inflación y Moneda:</strong> Funcionaba el sistema de la Caja de Conversión (patrón oro). La emisión estaba atada a las reservas de oro, lo que mantenía la inflación baja pero ataba la economía a los shocks externos.</li>
+                    </ul>
+                    <p class="mt-4 border-l-4 border-archive-accent pl-4 italic text-slate-600">El modelo colapsó con la <strong>Crisis de Wall Street de 1929</strong>. Cayeron los precios internacionales de los cereales y el flujo de capitales se cortó, hundiendo a la economía argentina y quitándole apoyo social a Yrigoyen, facilitando el golpe militar de 1930.</p>
+                </div>
+
+                <div id="tab-pre1930-his" class="tab-content hidden animate-fadeIn">
+                    <div class="bg-slate-50 p-8 rounded-lg shadow-inner border border-slate-200">
+                        <h3 class="text-xl font-bold font-sans text-slate-900 mb-6">Perspectivas Historiográficas</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="font-bold font-sans text-archive-accent mb-2">Historia Liberal/Institucionalista</h4>
+                                <p class="text-sm text-slate-700">Destacan a la Generación del 80 como los constructores del Estado moderno y ven al Radicalismo como el paso necesario hacia la democracia. Critican al Yrigoyenismo por su caudillismo y el deterioro institucional, pero lo consideran fundamental para la participación ciudadana (ej. Luis Alberto Romero).</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold font-sans text-archive-accent mb-2">Revisionismo Histórico Nacionalista</h4>
+                                <p class="text-sm text-slate-700">Critican ferozmente a la élite del 80 por "entregar" el país al imperialismo británico. Ven a Yrigoyen como el primer líder popular nacionalista que intentó defender la soberanía, frenado por la oligarquía terrateniente que orquestó el golpe de 1930 (ej. José María Rosa).</p>
+                            </div>
+                            <div class="md:col-span-2 bg-white p-4 rounded border border-slate-200">
+                                <h4 class="font-bold font-sans text-archive-accent mb-2">Marxismo y Teoría de la Dependencia</h4>
+                                <p class="text-sm text-slate-700">Consideran que tanto el PAN como la UCR representaban distintas fracciones de la burguesía. El MAE fue un sistema de explotación, y el radicalismo no fue una revolución social, sino una adaptación para asimilar a las clases medias sin tocar los intereses de la oligarquía (ej. Milcíades Peña).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: DÉCADA INFAME -->
+            <section id="sec-decada_infame" class="page-section hidden">
+                <header class="mb-8 border-b border-archive-border pb-6">
+                    <h2 class="text-4xl font-bold text-slate-900 mb-2">2. La Década Infame (1930-1943)</h2>
+                    <p class="text-archive-muted text-lg italic">Restauración conservadora, fraude e intervención estatal.</p>
+                </header>
+                
+                <p class="mb-6 leading-relaxed text-lg text-slate-700">Marcada por el primer golpe de Estado del siglo XX, la "Década Infame" es un período de profundas paradojas: retroceso en la calidad democrática, pero simultáneamente el nacimiento del Estado intervencionista moderno en Argentina y el surgimiento de una nueva clase obrera industrial.</p>
+
+                <div class="flex flex-wrap border-b border-archive-border mb-8 font-sans">
+                    <button class="tab-btn px-4 py-3 font-bold text-archive-accent border-b-2 border-archive-accent hover:bg-slate-50 transition-colors" onclick="openInnerTab('sec-decada_infame', 'tab-decada-pol', this)">Política y Fraude</button>
+                    <button class="tab-btn px-4 py-3 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-800 hover:bg-slate-50 transition-colors" onclick="openInnerTab('sec-decada_infame', 'tab-decada-eco', this)">Transformación Económica</button>
+                    <button class="tab-btn px-4 py-3 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-800 hover:bg-slate-50 transition-colors" onclick="openInnerTab('sec-decada_infame', 'tab-decada-his', this)">Debate Historiográfico</button>
+                </div>
+
+                <div id="tab-decada-pol" class="tab-content block animate-fadeIn space-y-5 leading-relaxed text-slate-800">
+                    <h3 class="text-2xl font-bold font-sans text-slate-900">El Golpe de 1930 y la Concordancia</h3>
+                    <p>El 6 de septiembre de 1930, el general José F. Uriburu derrocó a Yrigoyen. Uriburu proponía un modelo corporativista, pero fracasó. Fue sucedido por el Gral. Agustín P. Justo, quien instauró un sistema llamado <strong>"fraude patriótico"</strong>.</p>
+                    <div class="bg-amber-50 p-5 rounded border border-amber-200">
+                        <p class="text-sm"><strong>La Justificación del Fraude:</strong> La alianza gobernante (La Concordancia) creía que el pueblo no estaba "capacitado" para votar y debía ser guiado por la élite para evitar el populismo yrigoyenista. En la práctica, esto significó proscripciones, robo de urnas, y exclusión sistemática de las mayorías del sistema político legal.</p>
+                    </div>
+                    
+                    <h3 class="text-2xl font-bold font-sans text-slate-900 mt-8">El Pacto Roca-Runciman (1933)</h3>
+                    <p>Ante el proteccionismo británico poscrisis, Argentina temió perder su mercado de carnes. Se firmó un tratado que aseguraba una cuota de exportación a cambio de enormes concesiones al capital británico (monopolio de transportes en Buenos Aires, liberación de aranceles). Este pacto simboliza para muchos historiadores la sumisión nacional de la época.</p>
+                </div>
+
+                <div id="tab-decada-eco" class="tab-content hidden animate-fadeIn space-y-5 leading-relaxed text-slate-800">
+                    <h3 class="text-2xl font-bold font-sans text-slate-900">El Nacimiento del Estado Interventor</h3>
+                    <p>Lejos del liberalismo clásico, frente a la crisis global, el gobierno conservador aplicó políticas intervencionistas pre-keynesianas impulsadas por figuras como Federico Pinedo y Raúl Prebisch.</p>
+                    <ul class="list-disc pl-6 space-y-3 mt-4 text-slate-700">
+                        <li><strong>Creación del BCRA (1935):</strong> Se fundó el Banco Central de la República Argentina para regular la moneda y el crédito, junto con Juntas Reguladoras para sostener precios agropecuarios.</li>
+                        <li><strong>Industrialización por Sustitución de Importaciones (ISI):</strong> Al no haber divisas para importar manufacturas, surgieron industrias livianas (textil, alimentos) en el conurbano bonaerense. Esto provocó una masiva <strong>migración interna</strong> del campo a la ciudad.</li>
+                        <li><strong>Paradoja de Resultados:</strong> La macroeconomía se estabilizó y creció, pero los beneficios se concentraron. Los nuevos obreros industriales (migrantes) vivían en condiciones precarias, con salarios bajos y sin legislación laboral protectora.</li>
+                    </ul>
+                </div>
+
+                <div id="tab-decada-his" class="tab-content hidden animate-fadeIn">
+                    <div class="bg-slate-50 p-8 rounded-lg shadow-inner border border-slate-200">
+                        <h3 class="text-xl font-bold font-sans text-slate-900 mb-6">Perspectivas y Debates Historiográficos</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="font-bold font-sans text-archive-accent mb-2">Corriente Nacionalista (FORJA)</h4>
+                                <p class="text-sm text-slate-700">Intelectuales como Jauretche y Scalabrini Ortiz denunciaron el período como el "Estatuto del coloniaje". Vieron en la creación del Banco Central (con directores británicos) y el Pacto Roca-Runciman actos de traición a la patria. Visibilizaron el subsuelo social explotado que prepararía el 17 de octubre.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold font-sans text-archive-accent mb-2">Perspectiva Económica Pragmática</h4>
+                                <p class="text-sm text-slate-700">Historiadores económicos señalan que, dada la crisis internacional, las medidas de Pinedo fueron modernas y exitosas para evitar el colapso total de la economía argentina. Salvaron a los productores rurales pero generaron las bases de la industria moderna (Gerchunoff).</p>
+                            </div>
+                            <div class="md:col-span-2 bg-white p-4 rounded border border-slate-200">
+                                <h4 class="font-bold font-sans text-archive-accent mb-2">Consenso Histórico</h4>
+                                <p class="text-sm text-slate-700">El cierre institucional (fraude) fue miope. La élite resolvió el problema macroeconómico pero ignoró la "cuestión social". La nueva clase obrera creada por sus propias políticas industriales quedó políticamente huérfana, creando el vacío de representación que pronto llenaría Juan Domingo Perón.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3: PERONISMO -->
+            <section id="sec-peronismo" class="page-section hidden">
+                <header class="mb-8 border-b border-archive-border pb-6">
+                    <h2 class="text-4xl font-bold text-slate-900 mb-2">3. El Peronismo Clásico (1943-1955)</h2>
+                    <p class="text-archive-muted text-lg italic">Origen, derechos sociales, polarización y la nueva matriz estatal.</p>
+                </header>
+                
+                <p class="mb-6 leading-relaxed text-lg text-slate-700">Este es el punto de inflexión más debatido de la historia argentina. Aquí exploraremos cómo el coronel Juan Domingo Perón capitalizó las condiciones sociales de la Década Infame para forjar un movimiento de masas que redefinió para siempre el contrato social, integrando a la clase obrera al consumo, pero instaurando una fuerte dinámica de polarización.</p>
+
+                <div class="flex flex-wrap border-b border-archive-border mb-8 font-sans">
+                    <button class="tab-btn px-4 py-3 font-bold text-archive-accent border-b-2 border-archive-accent hover:bg-slate-50 transition-colors" onclick="openInnerTab('sec-peronismo', 'tab-peron-pol', this)">Origen y Política</button>
+                    <button class="tab-btn px-4 py-3 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-800 hover:bg-slate-50 transition-colors" onclick="openInnerTab('sec-peronismo', 'tab-peron-eco', this)">Economía y Resultados</button>
+                    <button class="tab-btn px-4 py-3 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-800 hover:bg-slate-50 transition-colors" onclick="openInnerTab('sec-peronismo', 'tab-peron-his', this)">Debate Historiográfico</button>
+                </div>
+
+                <div id="tab-peron-pol" class="tab-content block animate-fadeIn space-y-5 leading-relaxed text-slate-800">
+                    <h3 class="text-2xl font-bold font-sans text-slate-900">Del GOU al 17 de Octubre</h3>
+                    <p>Tras el golpe de 1943, Perón asume la Secretaría de Trabajo y Previsión. Desde allí, materializa demandas históricas del sindicalismo: indemnizaciones, vacaciones pagas, estatuto del peón rural. Ante su creciente poder, un sector del ejército lo encarcela.</p>
+                    <p class="bg-amber-50 p-4 border-l-4 border-archive-accent rounded"><strong>El 17 de Octubre de 1945:</strong> Una movilización popular masiva de trabajadores hacia Plaza de Mayo exige su liberación. Es el acto fundacional del movimiento. Perón gana elecciones limpias en 1946 enfrentando a la Unión Democrática.</p>
+                    
+                    <h3 class="text-2xl font-bold font-sans text-slate-900 mt-8">Transformación y Polarización Política</h3>
+                    <p><strong>Lo que hicieron:</strong> Voto Femenino (1947, impulsado por Eva Perón). Constitución de 1949 (derechos sociales, reelección presidencial). Creación de la Fundación Eva Perón (asistencia social directa).</p>
+                    <p><strong>La Polarización:</strong> Se estableció una dicotomía rígida ("Pueblo vs. Oligarquía"). El gobierno aplicó censura a la prensa opositora (expropiación del diario La Prensa), intervino universidades y fomentó el culto a la personalidad en el sistema educativo, lo que cimentó un profundo odio en las clases medias y altas (antiperonismo).</p>
+                </div>
+
+                <div id="tab-peron-eco" class="tab-content hidden animate-fadeIn space-y-5 leading-relaxed text-slate-800">
+                    <h3 class="text-2xl font-bold font-sans text-slate-900">Estado Benefactor y Redistribución (1946-1949)</h3>
+                    <p>El modelo económico fue nacionalista y estatista. Se nacionalizaron el Banco Central, ferrocarriles, teléfonos y puertos.</p>
+                    <div class="grid md:grid-cols-2 gap-6 mt-4">
+                        <div class="bg-slate-50 p-4 rounded border border-slate-200">
+                            <h4 class="font-bold text-slate-900">El IAPI y la Redistribución</h4>
+                            <p class="text-sm">El IAPI monopolizó el comercio exterior. Compraba barato al productor agropecuario y vendía caro al mundo (aprovechando precios de posguerra). Esa diferencia financiaba la industria y el <strong>"fifty-fifty"</strong> (50% de la renta nacional para los trabajadores). Hubo un boom del mercado interno.</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded border border-slate-200">
+                            <h4 class="font-bold text-slate-900">Crisis y Cambio de Rumbo (1949-1955)</h4>
+                            <p class="text-sm">El modelo se agotó: cayeron los precios internacionales y el campo produjo menos. Faltaron divisas para importar insumos industriales. Apareció <strong>la inflación crónica de dos dígitos</strong>. Perón aplicó el Plan de Estabilización de 1952 (Gómez Morales), congelando salarios y pidiendo austeridad.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-peron-his" class="tab-content hidden animate-fadeIn">
+                    <div class="bg-slate-50 p-8 rounded-lg shadow-inner border border-slate-200 space-y-6">
+                        <h3 class="text-xl font-bold font-sans text-slate-900">El Gran Debate Académico</h3>
+                        
+                        <div>
+                            <h4 class="font-bold font-sans text-archive-accent">Teoría de las "Masas Disponibles" (Gino Germani)</h4>
+                            <p class="text-sm text-slate-700">Visión liberal-sociológica clásica. Germani vio al peronismo como un fascismo adaptado. Argumentó que los migrantes internos recientes eran "masas anómicas" sin experiencia política, manipulables por un líder carismático demagogo que intercambió derechos por libertad.</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold font-sans text-archive-accent">Nueva Sociología Histórica (Murmis/Portantiero, D. James)</h4>
+                            <p class="text-sm text-slate-700"><strong>Visión académica hegemónica actual.</strong> Refutan a Germani demostrando que no hubo engaño. Hubo una <em>alianza de clases</em> racional. La clase obrera apoyó a Perón porque materializó desde el Estado sus programas históricos. Fue un proceso de "democratización del bienestar" donde el obrero fue un actor político consciente.</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold font-sans text-archive-accent">Visión Económica Ortodoxa (Cortés Conde / Gerchunoff)</h4>
+                            <p class="text-sm text-slate-700">Señalan que Perón maximizó el corto plazo a costa del largo plazo. Al descapitalizar al campo para financiar industrias livianas ineficientes, generó una matriz económica incapaz de auto-sostenerse, sentando las bases de la inflación crónica y los ciclos de crisis posteriores.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 4: INESTABILIDAD -->
+            <section id="sec-inestabilidad" class="page-section hidden">
+                <header class="mb-8 border-b border-archive-border pb-6">
+                    <h2 class="text-4xl font-bold text-slate-900 mb-2">4. Inestabilidad y Violencia (1955-1976)</h2>
+                    <p class="text-archive-muted text-lg italic">Proscripción, empate hegemónico y el camino hacia la tragedia.</p>
+                </header>
+                
+                <p class="mb-6 leading-relaxed text-lg text-slate-700">Tras el violento derrocamiento de Perón en 1955 (incluyendo el brutal bombardeo a la Plaza de Mayo), el sistema político intentó funcionar excluyendo a la mayoría electoral. Comprenderemos aquí el "empate hegemónico", los intentos de modernización ("Desarrollismo") y la radicalización de la juventud.</p>
+
+                <div class="flex flex-wrap border-b border-archive-border mb-8 font-sans">
+                    <button class="tab-btn px-4 py-3 font-bold text-archive-accent border-b-2 border-archive-accent hover:bg-slate-50 transition-colors" onclick="openInnerTab('sec-inestabilidad', 'tab-inesta-pol', this)">Juego Imposible</button>
+                    <button class="tab-btn px-4 py-3 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-800 hover:bg-slate-50 transition-colors" onclick="openInnerTab('sec-inestabilidad', 'tab-inesta-eco', this)">Stop & Go</button>
+                    <button class="tab-btn px-4 py-3 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-800 hover:bg-slate-50 transition-colors" onclick="openInnerTab('sec-inestabilidad', 'tab-inesta-vio', this)">Violencia Política</button>
+                    <button class="tab-btn px-4 py-3 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-800 hover:bg-slate-50 transition-colors" onclick="openInnerTab('sec-inestabilidad', 'tab-inesta-his', this)">Debate</button>
+                </div>
+
+                <div id="tab-inesta-pol" class="tab-content block animate-fadeIn space-y-5 leading-relaxed text-slate-800">
+                    <h3 class="text-2xl font-bold font-sans text-slate-900">La Libertadora y la Proscripción</h3>
+                    <p>La "Revolución Libertadora" buscó "desperonizar" la sociedad. Prohibieron pronunciar el nombre de Perón, cantar la marcha, intervinieron sindicatos y fusilaron militares rebeldes (1956). Esto originó la "Resistencia Peronista", convenciendo a la clase obrera de que el peronismo era su única identidad política válida.</p>
+                    
+                    <h3 class="text-2xl font-bold font-sans text-slate-900 mt-8">Democracias Condicionadas (El "Juego Imposible")</h3>
+                    <p>El sistema tenía elecciones, pero sin el principal partido. 
+                    <br><strong>Arturo Frondizi (1958-1962):</strong> Gana pactando en secreto con Perón. Intenta integrar a los sindicatos, pero las FF.AA. lo derrocan tras permitir al peronismo ganar gobernaciones en 1962.
+                    <br><strong>Arturo Illia (1963-1966):</strong> Gana con el peronismo en blanco. Un gobierno institucionalista. Sufre oposición sindical feroz, boicot mediático y finalmente un golpe militar que lo acusa de "lento".</p>
+                </div>
+
+                <div id="tab-inesta-eco" class="tab-content hidden animate-fadeIn space-y-5 leading-relaxed text-slate-800">
+                    <h3 class="text-2xl font-bold font-sans text-slate-900">Desarrollismo y el Ciclo Stop and Go</h3>
+                    <p><strong>El modelo de Frondizi (Desarrollismo):</strong> Reconoció que la ISI del peronismo era insuficiente. Fomentó radicalmente la inversión extranjera (IED) en petróleo, automotrices y petroquímica. Hubo un salto tecnológico inmenso, pero aumentó la dependencia de insumos extranjeros.</p>
+                    <div class="bg-red-50 p-5 rounded border border-red-200 mt-4">
+                        <h4 class="font-bold text-red-900 mb-2">La Trampa Macro: "Stop and Go"</h4>
+                        <p class="text-sm text-red-800">La economía oscilaba sistemáticamente. Las fases de crecimiento expansivo agotaban los dólares del Banco Central (Stop). Se acudía al FMI, que exigía devaluación y ajuste. Esto bajaba el salario real, provocaba huelgas brutales de los sindicatos, el gobierno cedía subiendo salarios nominales, y reiniciaba el ciclo (Go) con una inflación cada vez más alta. <span class="font-bold">La inflación promedió un 25-30% anual crónico.</span></p>
+                    </div>
+                </div>
+
+                <div id="tab-inesta-vio" class="tab-content hidden animate-fadeIn space-y-5 leading-relaxed text-slate-800">
+                    <h3 class="text-2xl font-bold font-sans text-slate-900">Del Cordobazo a las Armas</h3>
+                    <p>El golpe de Onganía (1966) intentó congelar la política mediante censura brutal para enfocarse en la economía. El fracaso estalló en el <strong>Cordobazo (1969)</strong>, una rebelión obrero-estudiantil masiva.</p>
+                    <p>El cierre democrático y el clima global llevaron a la juventud a la lucha armada: <strong>Montoneros</strong> (peronistas de izquierda) y <strong>ERP</strong> (marxistas). Perón, desde el exilio, alentó a estas formaciones para presionar a la dictadura de Lanusse.</p>
+                    <p class="border-l-4 border-slate-400 pl-4 text-slate-600 mt-4">Perón retorna en 1973, pero en el poder se inclina por la ortodoxia sindical, expulsando a Montoneros de la Plaza en 1974. A su muerte, bajo el gobierno de Isabel Perón, el Estado crea la <strong>Triple A</strong> (parapolicial) para exterminar a la izquierda, sumiendo al país en un baño de sangre y caos económico (Rodrigazo).</p>
+                </div>
+
+                <div id="tab-inesta-his" class="tab-content hidden animate-fadeIn">
+                    <div class="bg-slate-50 p-8 rounded-lg shadow-inner border border-slate-200">
+                        <h3 class="text-xl font-bold font-sans text-slate-900 mb-6">Teorías del Conflicto</h3>
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="font-bold font-sans text-archive-accent">El "Empate Hegemónico" (J.C. Portantiero)</h4>
+                                <p class="text-sm text-slate-700">Teoría fundamental. La sociedad argentina tenía dos grandes bloques (burguesía agro-financiera vs. alianza obrero-industrial). Ninguno tenía fuerza para imponer su modelo a largo plazo, pero ambos tenían "poder de veto" sobre el otro, resultando en parálisis institucional e inflación como mecanismo de puja distributiva.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold font-sans text-archive-accent">Estado Burocrático Autoritario (G. O'Donnell)</h4>
+                                <p class="text-sm text-slate-700">Analiza las dictaduras post-66. Argumenta que cuando la ISI fácil se agota, el capitalismo periférico requiere "orden" para garantizar rentabilidad. Las FF.AA., aliadas a tecnócratas, toman el poder institucionalmente para disciplinar a una clase obrera muy fuerte.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold font-sans text-archive-accent">El Debate sobre la Violencia (70s)</h4>
+                                <p class="text-sm text-slate-700">La academia actual critica la "militarización de la política". Las guerrillas, al continuar la lucha armada *incluso durante el gobierno democrático peronista (73-76)*, evidenciaron que su objetivo era la toma revolucionaria del poder, contribuyendo a la espiral de violencia que justificó en gran parte de la sociedad el golpe de 1976 (Vezzetti, Romero).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 5: DICTADURA -->
+            <section id="sec-dictadura" class="page-section hidden">
+                <header class="mb-8 border-b border-archive-border pb-6">
+                    <h2 class="text-4xl font-bold text-slate-900 mb-2">5. La Dictadura Militar (1976-1983)</h2>
+                    <p class="text-archive-muted text-lg italic">Terrorismo de Estado, desindustrialización y la ruptura del pacto social.</p>
+                </header>
+                
+                <p class="mb-6 leading-relaxed text-lg text-slate-700">El "Proceso de Reorganización Nacional" representa el quiebre más profundo de la historia argentina contemporánea. El objetivo no fue solo "restaurar el orden", sino utilizar el exterminio estatal sistemático para disciplinar a la sociedad e implantar a la fuerza un nuevo modelo económico basado en la valorización financiera.</p>
+
+                <div class="flex flex-wrap border-b border-archive-border mb-8 font-sans">
+                    <button class="tab-btn px-4 py-3 font-bold text-archive-accent border-b-2 border-archive-accent hover:bg-slate-50 transition-colors" onclick="openInnerTab('sec-dictadura', 'tab-dicta-pol', this)">Terrorismo de Estado</button>
+                    <button class="tab-btn px-4 py-3 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-800 hover:bg-slate-50 transition-colors" onclick="openInnerTab('sec-dictadura', 'tab-dicta-eco', this)">Economía y Gráfico</button>
+                    <button class="tab-btn px-4 py-3 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-800 hover:bg-slate-50 transition-colors" onclick="openInnerTab('sec-dictadura', 'tab-dicta-his', this)">Debate Historiográfico</button>
+                </div>
+
+                <div id="tab-dicta-pol" class="tab-content block animate-fadeIn space-y-5 leading-relaxed text-slate-800">
+                    <h3 class="text-2xl font-bold font-sans text-slate-900">La Represión Clandestina Sistemática</h3>
+                    <p>A diferencia de golpes anteriores, la Junta (Videla, Massera, Agosti) ejecutó un plan clandestino e ilegal de represión desde el aparato del Estado, desapareciendo garantías constitucionales.</p>
+                    <ul class="list-disc pl-6 space-y-2 text-slate-700 bg-red-50 p-5 rounded border border-red-100">
+                        <li><strong>Metodología:</strong> Secuestros nocturnos, Centros Clandestinos de Detención (ESMA, La Perla), tortura sistemática, vuelos de la muerte. Apropiación ilegal de bebés.</li>
+                        <li><strong>El Blanco:</strong> Aunque justificaron el golpe en el combate a la guerrilla (que para 1976 ya estaba operativamente mermada), la mayoría de las víctimas fueron delegados de fábrica, estudiantes y profesionales que representaban el tejido civil. Se buscaba desarticular la resistencia sindical al modelo económico.</li>
+                    </ul>
+                    
+                    <h3 class="text-2xl font-bold font-sans text-slate-900 mt-8">Guerra de Malvinas (1982)</h3>
+                    <p>Ante la crisis económica de 1981 y protestas sociales incipientes, Galtieri decidió la recuperación militar de Malvinas para cohesionar a la sociedad. La derrota militar aplastante deslegitimó totalmente a las Fuerzas Armadas, forzando la transición democrática (1983).</p>
+                </div>
+
+                <div id="tab-dicta-eco" class="tab-content hidden animate-fadeIn space-y-5 leading-relaxed text-slate-800">
+                    <h3 class="text-2xl font-bold font-sans text-slate-900">Martínez de Hoz y la "Plata Dulce"</h3>
+                    <p>El plan económico buscó destruir al actor más molesto del "empate hegemónico": la industria nacional y su clase obrera organizada.</p>
+                    <p><strong>Medidas:</strong> Apertura irrestricta de importaciones y sobrevaluación del peso ("Tablita"). Las fábricas argentinas quebraron masivamente. Comenzó la "bicicleta financiera": inversores traían dólares, los pasaban a pesos a altísimas tasas de interés garantizadas por el Estado, y volvían a comprar dólares para fugar capitales.</p>
+                    
+                    <!-- Chart Container para Deuda -->
+                    <div class="my-8 bg-white p-4 rounded-lg shadow border border-slate-100">
+                        <h4 class="text-center font-sans font-bold text-slate-800 mb-2 text-lg">Evolución de la Deuda Externa Pública (1975-1983)</h4>
+                        <div class="chart-container">
+                            <canvas id="deudaChart"></canvas>
+                        </div>
+                        <p class="text-xs text-center text-slate-500 mt-4 px-4">Datos en Millones de USD. Al final del período, se estatizó gran parte de la deuda privada de grandes empresas, transfiriendo el costo a la sociedad entera.</p>
+                    </div>
+                </div>
+
+                <div id="tab-dicta-his" class="tab-content hidden animate-fadeIn">
+                    <div class="bg-slate-50 p-8 rounded-lg shadow-inner border border-slate-200 space-y-6">
+                        <h3 class="text-xl font-bold font-sans text-slate-900">De los "Dos Demonios" al Pacto Cívico-Militar</h3>
+                        
+                        <div>
+                            <h4 class="font-bold font-sans text-archive-accent">Teoría de los Dos Demonios (1984)</h4>
+                            <p class="text-sm text-slate-700">Interpretación temprana (prevalente en el prólogo original del Nunca Más). Postulaba que la sociedad pacífica quedó atrapada entre terrorismo de extrema izquierda y extrema derecha. <strong>Crítica actual:</strong> Iguala fuerzas asimétricas; el Estado tiene el monopolio de la ley, usarlo para masacrar ciudadanos no tiene equiparación.</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold font-sans text-archive-accent">Pacto Cívico-Militar (Visión Actual Hegemónica)</h4>
+                            <p class="text-sm text-slate-700">Señala que el concepto de "guerra" oculta que fue un plan unidireccional del Estado. Hace énfasis en la complicidad de sectores <strong>civiles</strong> (empresariado agrario/financiero, medios) que apoyaron y se beneficiaron del golpe para imponer un modelo excluyente (Novaro, Quiroga).</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold font-sans text-archive-accent">Lectura Estructuralista (E. Basualdo)</h4>
+                            <p class="text-sm text-slate-700">Interpretan la dictadura como una revancha clasista. El genocidio fue la herramienta para producir un "cambio en la matriz de acumulación": pasar de una economía basada en el salario (industria) a una basada en la renta financiera, transfiriendo ingresos al capital concentrado.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 6: CRISIS DEL 2001 -->
+            <section id="sec-crisis2001" class="page-section hidden">
+                <header class="mb-8 border-b border-archive-border pb-6">
+                    <h2 class="text-4xl font-bold text-slate-900 mb-2">6. Crisis del 2001 y Gobierno de De la Rúa</h2>
+                    <p class="text-archive-muted text-lg italic">El colapso del Consenso de Washington, Convertibilidad y estallido social.</p>
+                </header>
+                
+                <p class="mb-6 leading-relaxed text-lg text-slate-700">Para entender diciembre de 2001, debemos remontarnos a las reformas de mercado y la "Convertibilidad" de la década de 1990 impulsadas por el Menemismo. Frenaron la hiperinflación pero generaron una bomba de tiempo en desempleo y deuda, que estalló en las manos de Fernando de la Rúa.</p>
+
+                <div class="flex flex-wrap border-b border-archive-border mb-8 font-sans">
+                    <button class="tab-btn px-4 py-3 font-bold text-archive-accent border-b-2 border-archive-accent hover:bg-slate-50 transition-colors" onclick="openInnerTab('sec-crisis2001', 'tab-crisis-pol', this)">Los 90s y De la Rúa</button>
+                    <button class="tab-btn px-4 py-3 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-800 hover:bg-slate-50 transition-colors" onclick="openInnerTab('sec-crisis2001', 'tab-crisis-eco', this)">Gráfico de Inflación</button>
+                    <button class="tab-btn px-4 py-3 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-800 hover:bg-slate-50 transition-colors" onclick="openInnerTab('sec-crisis2001', 'tab-crisis-his', this)">Debate Académico</button>
+                </div>
+
+                <div id="tab-crisis-pol" class="tab-content block animate-fadeIn space-y-5 leading-relaxed text-slate-800">
+                    <h3 class="text-2xl font-bold font-sans text-slate-900">La Convertibilidad de Menem (1 Peso = 1 Dólar)</h3>
+                    <p>El ministro Domingo Cavallo fijó por ley el tipo de cambio. Esto frenó la hiperinflación de inmediato. Sin embargo, hizo que la producción nacional fuera cara, provocando desindustrialización y desempleo estructural masivo. Para sostener el modelo, el Estado debió endeudarse sistemáticamente en dólares y privatizar todas las empresas públicas (YPF, Aerolíneas).</p>
+                    
+                    <h3 class="text-2xl font-bold font-sans text-slate-900 mt-8">La Alianza y el Estallido (Diciembre 2001)</h3>
+                    <p>Fernando de la Rúa asume (1999) prometiendo honestidad pero manteniendo el "1 a 1" por temor social. La economía llevaba años de recesión profunda. Ante el déficit fiscal, aplicó fuertes ajustes (recorte a jubilados y salarios públicos) intentando enviar señales al FMI.</p>
+                    <div class="bg-red-50 p-4 border-l-4 border-red-600 mt-4 text-sm">
+                        <p><strong>El Corralito:</strong> Ante la fuga masiva de dólares de los bancos, Cavallo (convocado nuevamente) impone restricciones para retirar efectivo. La clase media reacciona con "Cacerolazos", mientras sectores marginales saquean supermercados. La represión deja 39 muertos. De la Rúa renuncia bajo el clamor popular de <em>"Que se vayan todos"</em>.</p>
+                    </div>
+                </div>
+
+                <div id="tab-crisis-eco" class="tab-content hidden animate-fadeIn space-y-5 leading-relaxed text-slate-800">
+                    <h3 class="text-2xl font-bold font-sans text-slate-900">El Costo de la Estabilidad Ficticia</h3>
+                    <p>Este gráfico muestra el problema crónico que la Convertibilidad quiso resolver (la hiperinflación del 89), cómo planchó los precios (incluso con deflación por recesión entre 1999-2001), y cómo el violento estallido del modelo en 2002 generó el mayor shock de pobreza histórico (54%).</p>
+                    
+                    <!-- Chart Container para Inflacion -->
+                    <div class="my-8 bg-white p-4 rounded-lg shadow border border-slate-100">
+                        <h4 class="text-center font-sans font-bold text-slate-800 mb-2 text-lg">Inflación Anual en Argentina (1985-2003)</h4>
+                        <div class="chart-container">
+                            <canvas id="inflacionChart"></canvas>
+                        </div>
+                        <p class="text-xs text-center text-slate-500 mt-4">Nota: El gráfico usa escala logarítmica para poder visualizar en el mismo cuadro picos de +3000% y tasas negativas (deflación).</p>
+                    </div>
+                </div>
+
+                <div id="tab-crisis-his" class="tab-content hidden animate-fadeIn">
+                    <div class="bg-slate-50 p-8 rounded-lg shadow-inner border border-slate-200 space-y-6">
+                        <h3 class="text-xl font-bold font-sans text-slate-900">Lecturas del Colapso</h3>
+                        
+                        <div>
+                            <h4 class="font-bold font-sans text-archive-accent">Visión Heterodoxa (Rapoport)</h4>
+                            <p class="text-sm text-slate-700">Interpretan la crisis como el colapso inevitable de un modelo económico primarizante, anti-industrial y basado en la renta especulativa impulsado por el FMI. La convertibilidad destruyó el tejido productivo e hizo insostenible socialmente el pago de la deuda.</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold font-sans text-archive-accent">Visión Ortodoxa (Llach, Sturzenegger)</h4>
+                            <p class="text-sm text-slate-700">Argumentan que la Convertibilidad era un buen régimen monetario, pero requería disciplina fiscal estricta. La crisis ocurrió porque los políticos mantuvieron altos déficits financiados con deuda y por la falta de flexibilidad en las leyes laborales.</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold font-sans text-archive-accent">Análisis Institucionalista-Político (Torre, Novaro)</h4>
+                            <p class="text-sm text-slate-700">Ponen el foco en la debilidad política de la Alianza. De la Rúa carecía de liderazgo, su coalición se fracturó temprano, y el peronismo ejecutó un asedio político ("golpe institucional") frente a una presidencia vaciada de poder que insistía en recetas económicas asfixiantes.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 7: CONCLUSIÓN -->
+            <section id="sec-conclusion" class="page-section hidden animate-fadeIn">
+                <header class="mb-8 border-b border-archive-border pb-6">
+                    <h2 class="text-4xl font-bold text-slate-900 mb-2">Conclusión Integradora y Mitos Históricos</h2>
+                    <p class="text-archive-muted text-lg italic">Síntesis estructural de la historia argentina y deconstrucción de falsas creencias.</p>
+                </header>
+                
+                <div class="space-y-8 leading-relaxed text-slate-800">
+                    <div class="bg-white p-8 border border-archive-border rounded-lg shadow-sm">
+                        <h3 class="text-2xl font-bold font-sans text-archive-accent border-b border-slate-200 pb-2 mb-6">El Patrón Estructural de la Historia</h3>
+                        <p class="mb-4">La historia argentina puede leerse a través de la tensión irresoluta entre <strong>integración global excluyente y desarrollo nacional inflacionario</strong>.</p>
+                        <ul class="list-disc pl-6 space-y-3 mb-6 bg-slate-50 p-6 rounded border border-slate-100">
+                            <li>El <strong>Modelo Agroexportador (1880-1930)</strong> generó enorme riqueza agregada pero masiva exclusión social, rompiéndose cuando el mundo se cerró.</li>
+                            <li>La <strong>Sustitución de Importaciones (1930-1976)</strong> integró a las masas y creó industria, pero adoleció de falta estructural de dólares ("restricción externa"), derivando en una brutal puja distributiva por el ingreso (inflación, "empate hegemónico").</li>
+                            <li>La <strong>Valorización Financiera y Neoliberalismo (1976-2001)</strong> resolvió esa puja disciplinando a los trabajadores mediante el desempleo y destruyendo la industria, reemplazando la inflación productiva por un endeudamiento externo crónico insostenible.</li>
+                        </ul>
+                        <p>Políticamente, el país sufrió una incapacidad crónica de sus actores para acordar "reglas de juego" democráticas permanentes, instrumentalizando el Estado para aniquilar al adversario.</p>
+                    </div>
+
+                    <div class="bg-slate-900 p-8 border border-archive-border rounded-lg shadow-sm text-slate-300">
+                        <h3 class="text-2xl font-bold font-sans text-amber-500 border-b border-slate-700 pb-2 mb-6">Desmontando Mitos Históricos</h3>
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="font-bold text-lg text-white">Mito 1: "Argentina fue potencia mundial antes del peronismo y este la arruinó".</h4>
+                                <p class="text-sm mt-1 leading-relaxed"><strong>Evidencia Académica:</strong> Falso por engañoso. Argentina tuvo un PBI per cápita altísimo alrededor de 1910. Pero ese indicador ocultaba una desigualdad extrema, analfabetismo y <em>nulo desarrollo industrial complejo</em>. Su "potencia" era un espejismo basado exclusivamente en precios agropecuarios. El declive económico relativo argentino comienza estructuralmente en la crisis de 1929, por la incapacidad de diversificar la matriz antes de que surgiera el peronismo.</p>
+                            </div>
+
+                            <div>
+                                <h4 class="font-bold text-lg text-white">Mito 2: "El peronismo inventó la inflación".</h4>
+                                <p class="text-sm mt-1 leading-relaxed"><strong>Evidencia Académica:</strong> Requiere matices profundos. La <em>inflación estructural de dos dígitos</em> sí se instala durante el gobierno de Perón (superando el 30% en 1952) por políticas expansivas y cuellos productivos. Sin embargo, las hiperinflaciones destructivas ocurrieron décadas después (1975, 1989), generadas por crisis de deuda impulsadas tanto por dictaduras, como por peronistas y radicales.</p>
+                            </div>
+
+                            <div>
+                                <h4 class="font-bold text-lg text-white">Mito 3: "La dictadura militar de 1976 fue solo una guerra para combatir el terrorismo guerrillero".</h4>
+                                <p class="text-sm mt-1 leading-relaxed"><strong>Evidencia Académica:</strong> Falso y refutado jurídicamente. La capacidad operativa armada del ERP y Montoneros ya estaba prácticamente aniquilada para marzo de 1976. El objetivo real del terror de Estado masivo y clandestino fue el disciplinamiento general de la sociedad (especialmente la dirigencia de base gremial) para refundar el sistema económico a favor de la concentración financiera, sin enfrentar resistencia social.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- App Logic & Charts -->
+    <script>
+        // State tracking
+        let chartDeudaRendered = false;
+        let chartInfRendered = false;
+        let chartDeudaInstance = null;
+        let chartInfInstance = null;
+
+        // --- NAVIGATION LOGIC ---
+
+        function navMain(sectionId, btnElement) {
+            // 1. Update UI for Sidebar Buttons
+            const allNavBtns = document.querySelectorAll('.nav-btn');
+            allNavBtns.forEach(btn => {
+                btn.classList.remove('active', 'bg-archive-accent', 'text-white', 'border-amber-900');
+                
+                // Add back default classes if not the special Conclusion button
+                if (!btn.classList.contains('bg-slate-800')) {
+                    btn.classList.add('text-slate-600', 'border-transparent');
+                }
+            });
+            
+            // Activate clicked button
+            btnElement.classList.add('active', 'bg-archive-accent', 'text-white', 'border-amber-900');
+            btnElement.classList.remove('text-slate-600', 'border-transparent');
+
+            // 2. Switch Main Sections
+            const allSections = document.querySelectorAll('.page-section');
+            allSections.forEach(sec => {
+                sec.classList.remove('block', 'animate-fadeIn');
+                sec.classList.add('hidden');
+            });
+            
+            const targetSection = document.getElementById(sectionId);
+            if(targetSection) {
+                targetSection.classList.remove('hidden');
+                targetSection.classList.add('block', 'animate-fadeIn');
+            }
+
+            // 3. Lazy Load Charts based on section
+            if(sectionId === 'sec-dictadura' && !chartDeudaRendered) {
+                setTimeout(initDeudaChart, 100); // small delay to ensure DOM is visible
+                chartDeudaRendered = true;
+            }
+            if(sectionId === 'sec-crisis2001' && !chartInfRendered) {
+                setTimeout(initInflacionChart, 100);
+                chartInfRendered = true;
+            }
+
+            // 4. Handle Mobile Menu Autoclose & Scroll Top
+            const sidebar = document.getElementById('sidebar');
+            if(!sidebar.classList.contains('hidden') && window.innerWidth < 768) {
+                sidebar.classList.add('hidden');
+            }
+            document.getElementById('main-scroll-area').scrollTo(0, 0);
+        }
+
+        // --- INNER TABS LOGIC (FIXED & ROBUST) ---
+
+        function openInnerTab(parentSectionId, targetTabId, clickedBtn) {
+            // 1. Get the parent section container to scope our changes locally
+            const parentSection = document.getElementById(parentSectionId);
+            if (!parentSection) return;
+
+            // 2. Hide all tab contents WITHIN this specific section
+            const allTabContents = parentSection.querySelectorAll('.tab-content');
+            allTabContents.forEach(content => {
+                content.classList.remove('block', 'animate-fadeIn');
+                content.classList.add('hidden');
+            });
+
+            // 3. Show the requested tab content
+            const targetContent = document.getElementById(targetTabId);
+            if (targetContent) {
+                targetContent.classList.remove('hidden');
+                // Force a reflow to restart animation, then add block
+                void targetContent.offsetWidth; 
+                targetContent.classList.add('block', 'animate-fadeIn');
+            }
+
+            // 4. Reset styling for all tab buttons WITHIN this specific section
+            const allTabBtns = parentSection.querySelectorAll('.tab-btn');
+            allTabBtns.forEach(btn => {
+                btn.classList.remove('text-archive-accent', 'border-archive-accent', 'font-bold');
+                btn.classList.add('text-slate-500', 'border-transparent', 'font-medium');
+            });
+
+            // 5. Apply active styling to the clicked button
+            clickedBtn.classList.remove('text-slate-500', 'border-transparent', 'font-medium');
+            clickedBtn.classList.add('text-archive-accent', 'border-archive-accent', 'font-bold');
+            
+            // If the targeted tab contains a canvas, we might need to tell Chart.js to resize/update
+            // since changing display:none to display:block can sometimes squish canvases.
+            if (targetTabId === 'tab-dicta-eco' && chartDeudaInstance) {
+                 chartDeudaInstance.resize();
+            }
+            if (targetTabId === 'tab-crisis-eco' && chartInfInstance) {
+                 chartInfInstance.resize();
+            }
+        }
+
+        // Mobile Menu Toggle logic
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('hidden');
+            // If opening, make it full width over content
+            if (!sidebar.classList.contains('hidden')) {
+                sidebar.classList.add('w-full');
+            }
+        });
+
+        // --- CHART.JS INITIALIZATIONS ---
+
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#475569';
+
+        function initDeudaChart() {
+            const ctx = document.getElementById('deudaChart').getContext('2d');
+            chartDeudaInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['1975', '1976', '1977', '1978', '1979', '1980', '1981', '1982', '1983'],
+                    datasets: [{
+                        label: 'Deuda Externa Total (Millones USD)',
+                        data: [7875, 8280, 9679, 12496, 19034, 27162, 35671, 43634, 45069],
+                        backgroundColor: '#b45309', // amber-700
+                        borderRadius: 4,
+                        borderWidth: 1,
+                        borderColor: '#78350f'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '$' + context.raw.toLocaleString() + ' Millones';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#e2e8f0' }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function initInflacionChart() {
+            const ctx = document.getElementById('inflacionChart').getContext('2d');
+            chartInfInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    // Selected years to show the extreme curve: previous stability, hyperinflation, 90s deflation, 2002 spike
+                    labels: ['1985', '1989', '1992', '1995', '1998', '1999', '2000', '2001', '2002', '2003'],
+                    datasets: [{
+                        label: 'Inflación Anual (%)',
+                        data: [385, 3079, 17.5, 1.6, 0.7, -1.8, -0.7, -1.5, 41.0, 3.7], 
+                        borderColor: '#dc2626', // red-600
+                        backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#991b1b',
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw.toLocaleString() + '% de Inflación';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'logarithmic', // Logarithmic is crucial here due to the 3000% peak
+                            title: { display: true, text: 'Inflación % (Escala Logarítmica)' },
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    // Make logarithmic ticks readable
+                                    if(value === 1 || value === 10 || value === 100 || value === 1000) return value + '%';
+                                    if(value === 0.1) return '0%';
+                                    return '';
+                                }
+                            }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
